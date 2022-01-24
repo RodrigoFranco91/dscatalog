@@ -1,0 +1,1 @@
+Neste capitulo fizemos a busca de Categoria por id.

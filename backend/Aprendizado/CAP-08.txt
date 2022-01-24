@@ -1,0 +1,11 @@
+Neste capitulo conversamos sobre Seed, ou seja, o povoamento no banco de dados para testarmos nossa aplicação. Siga o passo a passo:
+	
+	1) Na pasta resources (a mesma que tem application.properties) vamos criar o arquivo data.sql (pode ser import.sql, mas esse dá problema em alguns
+	sistemas)
+
+	2) Vamos deixar dentro desse arquivo o script que povoa o banco. Com H2 toda hora que aplicação sobe ele vai executar esse script e isso facilita
+	muit a nossa vida, pois por padrão tudo que salvamos no H2 é perdido quando derrubamos a aplicação. Veja o script:
+
+		INSERT INTO tb_category (name) VALUES ('Books');
+		INSERT INTO tb_category (name) VALUES ('Eletronics');
+		INSERT INTO tb_category (name) VALUES ('Computes');

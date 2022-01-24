@@ -1,0 +1,48 @@
+Neste capitulo implementamos o insert, update e delete de Product:
+
+	
+- Vamos alterar o método insert() e update() da classe ProductService:
+
+	@Transactional
+	public ProductDTO insert(ProductDTO dto) {
+		Product product = new Product();
+		copyDtoToEntity(dto, product);
+		product = repository.save(product);
+		return new ProductDTO(product);
+	}
+
+
+
+	@Transactional
+	public ProductDTO update(Long id, ProductDTO dto) {
+		try {
+			Product product = repository.getOne(id);
+			copyDtoToEntity(dto, product);
+			repository.save(product);
+			return new ProductDTO(product);
+		}catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Não há categoria com id "+ id);
+		}
+
+	}
+
+	Ambos os métodos chamam o método copyDtoToEntity(), esse método transforma o DTO para Entity. Veja:
+
+	private void copyDtoToEntity(ProductDTO dto, Product product) {
+		
+		product.setName(dto.getName());
+		product.setDescription(dto.getDescription());
+		product.setDate(dto.getDate());
+		product.setImgUrl(dto.getImgUrl());
+		product.setPrice(dto.getPrice());
+		
+		//Garantir que não tem Categoria na lista
+		product.getCategories().clear();
+		
+		//Convertendo CategoriaDTO em categoria e depois colocando no Product
+		dto.getCategories().forEach(productDTO -> {
+			Category categoryEntity = productRepository.getOne(productDTO.getId());
+			product.getCategories().add(categoryEntity);
+		});
+		
+	}

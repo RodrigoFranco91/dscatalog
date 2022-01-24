@@ -1,0 +1,50 @@
+Neste capitulo criamos o ProductDTO:
+
+	
+	1) No pacote dto criei a classe ProductDTO:
+
+public class ProductDTO implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
+	private Long id;
+	private String name;
+	private String description;
+	private String price;
+	private String imgUrl;
+	private Instant date;
+	private List<CategoryDTO> categories = new ArrayList<>();
+
+	public ProductDTO() {
+		
+	}
+
+	public ProductDTO(Long id, String name, String description, String price, String imgUrl, Instant date) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.price = price;
+		this.imgUrl = imgUrl;
+		this.date = date;
+	}
+	
+	
+	//Vamos usar para o findAll() de todos produtos;
+	//Para todos não vamos mostrar as categorias.
+	public ProductDTO(Product entity) {
+		this.id = entity.getId();
+		this.name = entity.getName();;
+		this.description = entity.getDescription();;
+		this.price = entity.getPrice();;
+		this.imgUrl = entity.getImgUrl();;
+		this.date = entity.getDate();;
+	}
+	
+	//Vamos usar para o findById() de um produto;
+	//Agora vamos mostrar as categorias.
+	//this(entity) vai chamar o consturtor anterior, pois ele tb recebe Prodcut
+	public ProductDTO(Product entity, Set<Category> categories) {
+		this(entity);
+		categories.forEach(category -> this.categories.add(new CategoryDTO(category)));
+	}
+
+	//GETTER E SETTERS.

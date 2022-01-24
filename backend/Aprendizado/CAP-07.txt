@@ -1,0 +1,9 @@
+Neste capitulo conversamos sobre:
+	
+	O perfil test que ativamos no arquivo application.properties, podemos ter vários e cada um usurá um banco de dados.
+
+	Falamos sobre o open-in-view = false, dessa forma a sessão do banco de dados se encerra na camada de serviço, ou seja, quando chega no controller a
+	mesma já foi fechada.
+
+	Aprendemos que com @Transactional abrimos uma transação e tudo do método é feito na mesma transação. E podemos informar ainda que a mesma é somente
+	de leitura e com isso não travamos o banco de dados quando fazemos leitura e assim temos melhor desemepenho.

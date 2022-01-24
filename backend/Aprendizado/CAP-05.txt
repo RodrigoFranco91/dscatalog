@@ -1,0 +1,1 @@
+Neste capitulo conversamos sobre o que é CRUD.

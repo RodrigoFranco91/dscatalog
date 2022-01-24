@@ -1,0 +1,3 @@
+Neste capitulo criamos o repositorio git para nosso projeto.
+
+	1) Fizemos o repositório na pasta dscatalog

@@ -1,0 +1,15 @@
+Neste capitulo criamos a classe de CategoryResource (é a Controller) e deixamos chumbado o retorno somente para teste:
+
+@RestController
+@RequestMapping("/categories")
+public class CategoryResource {
+
+	@GetMapping
+	public ResponseEntity<List<Category>> findAll() {
+		List<Category> list = new ArrayList();
+		list.add(new Category(1L, "Books"));
+		list.add(new Category(2L, "Eletronics"));
+		return ResponseEntity.ok().body(list);
+	}
+
+}

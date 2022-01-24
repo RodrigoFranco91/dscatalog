@@ -1,0 +1,3 @@
+Neste capitulo criamos a classe Product:
+
+	- Criamos a classe Product, colocamos as anotações do JPA e criamos o relacionamento com Category.

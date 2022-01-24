@@ -1,0 +1,26 @@
+Neste capitulo continuamos a configuração da classe Product:
+
+	- No atributo que faz o relacionamento de Product com Category, no caso Set<Category> categories = new HashSet<>(); tivemos que anotá-lo para de
+	fato haver o relacionamento. Veja como ficou:
+
+	@ManyToMany
+	@JoinTable(name="tb_product_category",
+		joinColumns = @JoinColumn(name = "product_id"),
+		inverseJoinColumns = @JoinColumn(name="category_id"))
+	private Set<Category> categories = new HashSet<>();
+
+	Entenda as anotações:
+	
+		@ManyToMany informa que o relacionamento é de N:N, ou seja, de muitos para muitos;
+
+		@JoinTable é para configurar a tabela extra que todo relacionamento N:N ganha e essa anotação tem diversos argumentos:
+
+			name = define o nome dessa tabela extra;
+
+			joinColumns = define a primeira chave dessa tabela extra, e tem que ser o da classe em que esse código foi escrito, no caso Product;
+
+			inverseJoinColumns = define a segunda chave dessa tabela extra, e tem que ser do mesmo tipo/classe para onde meu relacionamento tá
+			apontando, no caso Category. Se estiver em dúvida basta ver que a List<>/Set<> é do tipo Category, basta seguir o tipo da 			Collection.
+
+
+	- Atualizamos o arquivo data.sql, aquele que faz o povoamento do banco de dados.

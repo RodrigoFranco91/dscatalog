@@ -1,0 +1,21 @@
+Neste capitulo fizemos o update de categoria:
+
+	-Tenha em mente que o cliente pode passar um id inexistente para atualizar uma categoria. Como vamos tratar isso? Usando o getOne() do repository,
+	pois ao tentar salvar um objeto retornado pelo getOne() que não exista com ID o método save() lança a Excpetion EntityNotFoundExcepetion(). Quando
+	ocorrer uma EntityNotFoundExcepetion() nós vamos coletá-la e depois lançar a nossa ResourceNotFoundException().  Veja como ficou o método da classe
+	service:
+
+	@Transactional
+	public CategoryDTO update(Long id, CategoryDTO dto) {
+		try {
+			Category category = repository.getOne(id);
+			category.setName(dto.getName());
+			repository.save(category);
+			return new CategoryDTO(category);
+		}catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Não há categoria com id "+ id);
+		}
+
+	}
+
+	Antes eu fazia findById() e caso não tivesse já retornava um  BadRequest ou lançava Excpetion, mas dessa forma eu tava fazendo uma consulta ao 	banco, já o getOne não faz essa consulta diretamente ao banco...

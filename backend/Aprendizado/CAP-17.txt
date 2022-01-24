@@ -1,0 +1,45 @@
+Neste capitulo fizemos a busca paginada no findAll:
+
+
+- Veja os parâmetros que pode haver na paginação:
+
+	@RequestParam(value = "page", defaultValue = "0") Integer page, => Indica a página que se quer ler
+	@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage, => Indica a quantidade de itens por página
+	@RequestParam(value = "orderBy", defaultValue = "name") String orderBy, => Indica qual o parâmetro usado para ordenar a listagem
+	@RequestParam(value = "direction", defaultValue = "ASC") String direction => Indica a ordem da listagem (ascendente ou descendente)
+
+	Veja que todo argumento tem o defaultValue, logo se o cliente não informar nada o mesmo terá o valor padrão.	
+
+- Para implementar siga o passo a passo:
+
+	1) O retorno do nosso Resource/Controller não será mais List<Category> e sim Page<Category>
+
+	2) O método que faz o findAll() vai receber como argumentos:
+	
+		@RequestParam(value = "page", defaultValue = "0") Integer page,
+		@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
+		@RequestParam(value = "orderBy", defaultValue = "name") String orderBy,
+		@RequestParam(value = "direction", defaultValue = "ASC") String direction
+
+	3) Criar um objeto do tipo PageRequest que será passado para o service que vai repassá-lo para o repository:
+
+		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+	
+	Veja que usamos os argumentos da paginação para fazer esse objeto.
+
+	4) Criar no Service o método findAllPaged() que vai receber como argumento o pageRequest:
+
+		@Transactional(readOnly = true)
+		public Page<CategoryDTO> findAllPaged(PageRequest pageRequest) {
+			Page<Category> list = repository.findAll(pageRequest);
+			//Page já é Stream, logo não precisamos .steam()
+			Page<CategoryDTO> dto = list.map(CategoryDTO::new);
+			return dto;
+		}
+	
+	Aqui não precisamos usar o .stream() na lista de Category para transformar em CategoryDTO, pois Page já é Stream.
+
+	5) Já existe por padrão no Repository o método findAll() que recebe PageRequest. Na verdade recebe Pageable e PageRequest é Pageable.
+
+	6) Podemos fazer a request para: localhost:8080/categories e teremos a paginação com os valores defaultValue, ou então passar cada argumento por
+	request param, por exemplo: localhost:8080/categories?page=1

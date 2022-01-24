@@ -1,0 +1,10 @@
+Neste capitulo criamos um ambiente no postman e o configuramos:
+
+	1) Trocamos o path (endereço) de localhost:8080/categories para {{host}}/categories
+
+	2) Clicamos em Enviroment -> Create Environment -> colocamos um nome ao Enviroment como dscatalog-bootcamp-local -> ainda na mesma página vamos 		criar a variável host com initial value e current value como http://localhost:8080 -> clicar no botão add
+
+	3) Na tela inicial do Postman temos que selecionar o ambiente que criamos, no caso dscatalog-bootcamp-local e isso se faz clicando na setinha pra 
+	apontada para baixo.
+
+	4) Dessa forma fica fácil mudar de ambiente de teste para produção.

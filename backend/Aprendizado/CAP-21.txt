@@ -1,0 +1,8 @@
+Neste capitulo criamos o ProductRepository, ProductResource e o ProductResource (controller). Alem disso testamos o GET (busca por produto) e configuramos
+todo o ambiente do Postman.
+
+
+	- Usamos muito o ctrl-c e ctrl-v para criar essas classes, pois na maioria dos metodos basta trocar Category para Product para funcionar (Use a 
+	IDE para isso, ctrl-f -> marcar o Case Sensitivy -> e em Find colocar Category e Replace colocar Product.)
+
+	

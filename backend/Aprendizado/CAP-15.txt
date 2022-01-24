@@ -1,0 +1,44 @@
+Neste capitulo fizemos o delete de categoria:
+
+	-Tenha em mente que o cliente pode passar um id inexistente para deletar uma categoria. Como vamos tratar isso? Capturando a Exception que o banco de dados lança ao tentar deletar algo que não existe e lançar a nossa Exception
+	que já é tratada pelo ControllerAdvice! Note que para podermos pegar essa excpetion o método não pode estar anotado com @Transactional.
+
+	-Outro problema que ocorre na deleção é deletar entidade que esta se relacionando, por exemplo: Vou deletar categoria 1 que é livro, mas há produtos que estão cadastrados com essa categoria. Como tratar isso? Novamente vamos
+	capturar a Exception que ocorre nesses casos e lançar uma exepction criada por nós e que é tratada pelo ControllerAdvice. Siga os passos:
+
+	1) Criar a classe DataBaseException:
+
+		public class DataBaseException extends RuntimeException {
+
+			private static final long serialVersionUID = 1L;
+	
+			public DataBaseException(String msg) {
+				super(msg);
+			}
+		}
+
+	2) Na classe ResourceExceptionHandler criar o método dataBase(), que no caso vai tratar a Exception DataBaseException:
+
+		@ExceptionHandler(value = DataBaseException.class)
+		public ResponseEntity<StandardError> dataBase(DataBaseException e, HttpServletRequest request) {
+			StandardError err = new StandardError();
+			err.setTimestamp(Instant.now());
+			err.setStatus(HttpStatus.BAD_REQUEST.value());
+			err.setError("Database Exception");
+			err.setMessage(e.getMessage());
+			err.setPath(request.getRequestURI());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+		}
+
+	3) Veja como ficou o service:
+
+		public void delete(Long id) {
+			try {
+				repository.deleteById(id);
+			}catch (EmptyResultDataAccessException e) {
+				throw new ResourceNotFoundException("Não há categoria com id "+ id);
+			}
+			catch (DataIntegrityViolationException e) {
+				throw new DataBaseException("Há produtos com essa categoria, por isso não pode deletá-la!");
+			}
+		}

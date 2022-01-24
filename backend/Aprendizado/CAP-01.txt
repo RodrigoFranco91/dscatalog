@@ -1,0 +1,8 @@
+Neste capitulo criamos o projeto Spring atraves do Spring Initializr:
+
+	1) Acessamos o site https://start.spring.io/ e configuramos o projeto com as depencendias H2, JPA Data, Web, Postgres.
+
+	2) A estrutura de pastas do projeto ficou: ws-bootcamp/dscatalog/backend
+
+	3) Alteramos o pom.xml para usar a versão 2.4.4 do Spring para seguir o professor.
+

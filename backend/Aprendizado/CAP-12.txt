@@ -1,0 +1,69 @@
+Neste capitulo fizemos o tratamento de exceção quando tentamos buscar uma categoria por id não existente:
+
+
+- Se não fizermos nada, quando o cliente fazer uma busca de categoria com id inexistente vai estourar um erro 500 e isso não indica nada ao cliente. Siga
+os passos a seguir:
+
+	1) Vamos criar uma exception nossa para indicar que categoria nao existe. Vamos criar a classe ResourceNotFoundException no pacote 	service.exceptions:
+
+		public class ResourceNotFoundException extends RuntimeException {
+
+			private static final long serialVersionUID = 1L;
+	
+			public EntityNotFoundException(String msg) {
+				super(msg);
+			}
+		}
+
+	2) Agora na classe CategoryService, no metodo findById() podemos verificar se o Repository achou a categoria com id passado, caso não achou vamos
+	lançar nossa exception, no caso EntityNotFoundException. Veja como ficou:
+
+		public CategoryDTO findById(Long id) {
+			Optional<Category> obj = repository.findById(id);
+			Category entity = obj.orElseThrow(() -> new ResourceNotFoundException("Categoria de id " + id + " não foi encontrada."));
+			return new CategoryDTO(entity);
+		}
+
+	3) Agora se o cliente fizer uma busca por ID inexistente ainda ele terá um erro 500, mas na aplicação o erro a ser estourado 	é EntityNotFoundException. Temos que capturar e tratar esse erro. Podemos fazer isso com try/catch na classe CategoryResource (Controller), mas 
+	existe uma maneira melhor, que é criando um Controller Advice, que é um filtro que pega Exceptions que ocorre nos controllers do Spring. Siga os
+	passos para fazer isso:
+
+		3.1) Vamos primeiro criar uma classe que será um casco/DTO que vai para o cliente com detalhes do erro ocorrido. Chamamos essa classe de
+		StandardError e criamos no pacote .resources.exceptions:
+
+			public class StandardError implements Serializable{
+
+				private static final long serialVersionUID = 1L;
+	
+				private Instant timestamp;
+				private Integer status;
+				private String error;
+				private String message;
+				private String path;
+	
+			public StandardError() {
+
+			}
+			
+			//Getter e Setters
+
+		3.2) Criar a classe ResourceExceptionHandler no pacote .resources.exceptions:
+
+			@ControllerAdvice
+			public class ResourceExceptionHandler {
+
+				@ExceptionHandler(value = ResourceNotFoundException.class)
+				public ResponseEntity<StandardError> entityNotFound(EntityNotFoundException e, HttpServletRequest request) {
+					StandardError err = new StandardError();
+					err.setTimestamp(Instant.now());
+					err.setStatus(HttpStatus.NOT_FOUND.value());
+					err.setError("Resource not found");
+					err.setMessage(e.getMessage());
+					err.setPath(request.getRequestURI());
+					return ResponseEntity.status(HttpStatus.NOT_FOUND).body(err);
+				}
+
+			}
+
+		Veja que é no metodo que a gente usa a anotação @ExceptionHandler para indicar qual excepetion vai tratar.
+

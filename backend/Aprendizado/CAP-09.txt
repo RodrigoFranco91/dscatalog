@@ -1,0 +1,40 @@
+Neste capitulo conversamos sobre DTO. Nossa classe Service e Resource (controller) devem devolver só DTO. 
+
+Trecho de código interessante:
+
+@Service
+public class CategoryService {
+
+	@Autowired
+	private CategoryRepository repository;
+
+	// Com isso eu garanto que todas operações no método findAll será executado na
+	// mesma transação.
+	// ReadOnly em true eu não dou Lock no banco, ou seja, como só vou ler o banco
+	// ele continua operando.
+	// e melhora o desemepenho.
+	@Transactional(readOnly = true)
+	public List<CategoryDTO> findAll() {
+		List<Category> list = repository.findAll();
+		List<CategoryDTO> dto = list.stream().map(CategoryDTO::new).collect(Collectors.toList());
+		return dto;
+	}
+
+}
+
+// 		List<CategoryDTO> dto = list.stream().map(CategoryDTO::new).collect(Collectors.toList());  Pode ser substituido por:
+
+//		List<CategoryDTO> dto = list.stream().map(category -> new CategoryDTO(category)).collect(Collectors.toList()); que pode ser substituido por:
+
+/*
+
+	@Transactional(readOnly = true)
+	public List<CategoryDTO> findAll() {
+		List<Category> list = repository.findAll();
+		List<CategoryDTO> dto = list.stream().map(category -> {
+			return new CategoryDTO(category);
+		}).collect(Collectors.toList());
+		return dto;
+	}
+
+*/

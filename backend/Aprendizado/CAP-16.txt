@@ -1,0 +1,36 @@
+Neste capitulo falamos sobre como fazer os dados de auditoria.
+
+
+	- É importante sabermos quando uma entidade foi cadastrada e alterada, pra isso podemos criar dois atributos na classe Entity;
+
+	- Lmembre-se que existe o fuso-horário, logo temos que escolher uma estratégia, no caso salvar o horário local juntamente com o local (por exemplo
+	GMT-3) ou então salvar o horário no formato universal, no caso UTC. Vamos usar a segunda estratégia e veremos que o banco de dados vai saber que
+	estamos acessando a base de dados no Brasil e já vai mostrar o nosso horário.
+
+	- Adicionamos na classe Category esses dois atributos:
+
+		@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+		private Instant createdAt;
+	
+		@Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
+		private Instant updateAt;
+
+		// Criamos o metodo get() para cada um
+
+	- Criamos os métodos que de fato vão setar na variável o horário. Esses métodos podem ser chamados lá na classe Service dentro dos metodos de 
+	insert() e update(), mas vamos fazer de um jeito melhor, vamos anotá-los com anotações da JPA que executa o método após o primeiro save (insert)
+	e após os outros saves (update). Veja:
+
+		@PrePersist
+		public void prePersist() {
+			createdAt = Instant.now();
+		}
+	
+		@PreUpdate
+		public void preUpdatet() {
+			updateAt = Instant.now();
+		}
+
+	- Lembra do arquivo que pova o banco de dados? Vamos adicionar com o instante. Veja como ficou:
+
+		INSERT INTO tb_category (name, created_At) VALUES ('Books', NOW());

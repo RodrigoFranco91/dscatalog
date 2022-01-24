@@ -1,0 +1,3 @@
+Neste capitulo começamos a preprar o código para usar o JPA Repositoy, criamos Repository, anotamos a classe Entity, criamos as classes Service,
+criamos o arquivo application-test.properties e povamos ele e o application.properties. Acessamos o localhost:8080/h2-console e criamos uma categoria no
+banco.
