@@ -1,0 +1,35 @@
+Nete capitulo fizemos o test do método findById() da classe ProductResource (controller). Lembre-se que o fingById() tem dois cenários, onde ele acha e 
+retorna o Product ou quando não há Product e uma Exception é lançada:
+
+
+	1) Criamos na classe dois atributos do tipo Long, um chamado existingId e o nonExistingId. Ambos serão inicializados no metodo setUp();
+
+	2) O método findById() da classe ProductResource() vai utilizar o método findById() do ProductRepository, logo temos que mockar esse comportamento.
+	Serão dois comportamentos, o que dá certo e o que lança Exception:
+
+		Mockito.when(service.findById(existingId)).thenReturn(productDTO);
+		Mockito.when(service.findById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
+
+	3) Criar o método para testar o cenário que há produto com o id:
+
+		@Test
+		public void findByIdShouldReturnProductWhenIdExists() throws Exception{
+			mockMvc.perform(get("/products/{id}", existingId).accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").exists())
+			.andExpect(jsonPath("$.name").exists())
+			.andExpect(jsonPath("$.description").exists());
+		}
+
+	Veja que no trecho jsonPath("$.id").exists() estamos verificando se a resposta da requisição contem um objeto com campo id. Através do $ temos o
+	objeto todo! (Pense na resposta que recebemos no Postman)
+
+	4) Criar o método para testar o cenário que é lançado a exception, ou seja, não há produto com Id informado:
+
+		@Test
+		public void findByIdShouldReturnNotFoundWhenIdDoesNotExist() throws Exception {
+		
+			mockMvc.perform(get("/products/{id}", nonExistingId).accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound());
+		}
+	

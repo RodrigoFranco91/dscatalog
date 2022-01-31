@@ -1,0 +1,35 @@
+Nete capitulo fizemos o teste do cenário save:
+
+	1) Criamos o pacote tests e dentro dele a classe Factory. Aqui teremos métodos para criar um Product e ProductDTO. Veja como ficou:
+
+public class Factory {
+
+	public static Product createProduct() {
+		Product product = new Product(1L, "Phone", "Good Phone", "800.00", "https://imng.com/img.png", Instant.parse("2020-10-20T03:00:00Z"));
+		product.getCategories().add(new Category(2L, "Eletronics"));
+		return product;
+	}
+	
+	public static ProductDTO createProductDTO() {
+		Product product = createProduct();
+		return new ProductDTO(product, product.getCategories());
+	}
+	
+}
+
+	2) Na classe ProductRepositorySave criamos o atributo countTotalProducts e o iniciamos com 25 dentro do método @BeforeEach setup();
+	
+	3) Na classe ProductRepositorySave criamos o método saveShouldPersistWithAutoincrementWhenIdIsNull(), ficando assim:
+
+	@Test
+	public void saveShouldPersistWithAutoincrementWhenIdIsNull() {
+		
+		Product product = Factory.createProduct();
+		product.setId(null);
+		
+		product = repository.save(product);
+		
+		Assertions.assertNotNull(product.getId());
+		Assertions.assertEquals(countTotalProducts + 1L, product.getId());
+		
+	}

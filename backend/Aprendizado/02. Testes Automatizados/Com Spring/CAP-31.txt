@@ -1,0 +1,42 @@
+Nete capitulo conversamos sobre o mockMvs.perform(), pois é um pouco complexo, pois há diversas chamadas encadeadas, fora que há imports Static. 
+
+
+- Vimos ainda que podemos substituir o código:
+
+	@Test
+	public void findAllShouldReturnPage() throws Exception {
+		//Fazendo a requisição do tipo GET para /products (há import static aqui)
+		mockMvc.perform(get("/products")).andExpect(status().isOk());
+	}
+
+Por:
+
+	@Test
+	public void findAllShouldReturnPage() throws Exception {
+		
+		ResultActions result = mockMvc.perform(get("/products");
+		result.andExpect(status().isOk());
+	}
+
+Ou seja, fazemos a requisição desejada, guardamos seu resultado, e depois comparamos em cima da variável que guardou o resultado da requisição.
+
+
+- Algo que é legal de se fazer é deixar claro com que MediaType estamos usando, no caso APPLICATION_JSON, o código ficaria asim:
+
+	@Test
+	public void findAllShouldReturnPage() throws Exception {
+		//Fazendo a requisição do tipo GET para /products (há import static aqui)
+		mockMvc.perform(get("/products").accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk());
+	}
+
+ou
+
+	@Test
+	public void findAllShouldReturnPage() throws Exception {
+		
+		ResultActions result = mockMvc.perform(get("/products")
+			.accpet(MediaType.APPLICATION_JSON));
+
+		result.andExpect(status().isOk());
+	}

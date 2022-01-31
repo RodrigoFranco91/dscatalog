@@ -1,0 +1,54 @@
+Neste capitulo fizemos o teste de integração na camada web, no caso ProductResource (Controller) no método update:
+
+
+- Siga os passos:
+
+	1) Ainda na classe ProductResourceIT, criar o atributo ObjectMapper anotado com @Autowired;
+
+	2) Vamos criar um método para testar o cenário que ocorre tudo certo no update() e um quando é informado um id inexistente
+
+	3) Veja como ficou os códigos:
+
+	@Test
+	public void updateShouldReturnProductDTOWhenIdExcist() throws Exception{
+		
+		ProductDTO productDTO = Factory.createProductDTO();
+		
+		//Precisamos enviar o corpo da Request em formado JSON:
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		String expcetedName = productDTO.getName();
+		String expectedDescription = productDTO.getDescription();
+		
+		mockMvc.perform(put("/products/{id}", existingId)
+				.content(jsonBody)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.id").value(existingId))
+					.andExpect(jsonPath("$.name").value(expcetedName))
+					.andExpect(jsonPath("$.description").value(expectedDescription));
+	}
+	
+	@Test
+	public void updateShouldReturnNotFoundWhenIdDoesNotExcist() throws Exception{
+		
+		ProductDTO productDTO = Factory.createProductDTO();
+		
+		//Precisamos enviar o corpo da Request em formado JSON:
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		String expcetedName = productDTO.getName();
+		String expectedDescription = productDTO.getDescription();
+		
+		mockMvc.perform(put("/products/{id}", nonExistingId)
+				.content(jsonBody)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isNotFound());
+					
+	}
+
+	Como a requisição de Update exige um corpo, criamos o mesmo e passamos via ObjectMapper para Json. (Criamos o DTO diretamente no método, mas podia
+	ser na classe e inicializá-lo no método setUp()
+

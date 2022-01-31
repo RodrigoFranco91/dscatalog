@@ -1,0 +1,23 @@
+Nete capitulo aprendemos o Padrão de Projeto Factory, para podermos instanciar objetos:
+
+
+	- Veja que nos dois testes que temos estamos tendo que dar new para criar a classe Account(). Com esse padrão isso vai mudar.
+
+
+	1) Criar o pacote tests.facotry e criar a classe AccountFactory:
+
+		public class AccountFactory {
+	
+			public static Account createEmptyAccount() {
+				return new Account(1L, 0.0);
+			}
+
+			public static Account createAccount(Double initialBalance) {
+				return new Account(1L, initialBalance);
+			}
+
+		}
+
+	2) Nos testes que tinhamos e estavamos usando new Account() vamos usar a fábrica:
+
+		Account acc = AccountFactory.createEmptyAccount();

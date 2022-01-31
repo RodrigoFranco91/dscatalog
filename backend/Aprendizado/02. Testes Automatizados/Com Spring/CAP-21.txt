@@ -1,0 +1,18 @@
+Nete capitulo foi apresentado o trabalho para fazer o teste do cenário de findById() do ProductRepository:
+
+
+	@Test
+	public void findByIdShouldReturnAOptionalNoEmptyWithIdExists() {
+		
+		Optional<Product> optional = repository.findById(id);
+		
+		Assertions.assertTrue(optional.isPresent());
+	}
+	
+	@Test
+	public void findByIdShouldReturnAOptionalEmptyWithIdDoesNotExists() {
+		
+		Optional<Product> optional = repository.findById(nonExistingId);
+		
+		Assertions.assertTrue(optional.isEmpty());
+	}

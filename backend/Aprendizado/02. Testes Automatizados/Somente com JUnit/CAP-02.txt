@@ -1,0 +1,10 @@
+Nete capitulo falamos sobre os tipos de testes:
+
+	- Teste Unitário: Teste que valida o comportamento de unidades funcionais do código, ou seja, métodos da classe. Esse tipo de teste não permite
+	que haja acesso das dependencias, ou seja, se uma classe que estou testando ( classe X) é dependente da classe Service eu não posso acessar a classe 	Service para realizar o teste de unidade, portante nesse teste não acessamos nada da internet, de banco de dados, etc, pelo menos não o verdadeiro,
+	pois podemos "mockar";
+
+	- Teste de Integração: Teste que verifica a comunicação/dependencia entre os componentes/módulos/classes. Aqui pode haver acesso externo, por
+	exemplo a outras API's, Bando de Dados..
+
+	- Teste funcional: É o teste no ponto de vista do usuário, verificamos se um funcionalidadde está executando corretamente.

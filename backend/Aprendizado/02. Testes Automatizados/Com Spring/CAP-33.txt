@@ -1,0 +1,45 @@
+Nete capitulo fizemos o test do método update() da classe ProductResource (controller). Lembre-se que teremos que mockar o método update() da classe ProductRepository e esse tem dois cenários, onde há o produto com id informado e onde não há (uma Exception é lançada):
+
+	
+	1) O primeiro passo é simular os cenários do método update() de ProductService que é uma dependencia de ProductResource(controller):
+
+		Mockito.when(service.update(ArgumentMatchers.eq(existingId), ArgumentMatchers.any())).thenReturn(productDTO);
+		Mockito.when(service.update(ArgumentMatchers.eq(nonExistingId), ArgumentMatchers.any())).thenThrow(ResourceNotFoundException.class);
+
+	Veja que o método update() recebe dois argumentos e quando usamos ArgumentMatchers.any() em um deles os outros devem ser passados via 	ArgumentMatchers.eq();
+
+	2) Criamos um método de teste para cada cenário:
+
+		@Test
+		public void updateShouldReturnProductDTOWhenIdExcist() throws Exception{
+		
+			//Precisamos enviar o corpo da Request em formado JSON:
+			String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+			mockMvc.perform(put("/products/{id}", existingId)
+					.content(jsonBody)
+					.contentType(MediaType.APPLICATION_JSON)
+					.accept(MediaType.APPLICATION_JSON))
+						.andExpect(status().isOk())
+						.andExpect(jsonPath("$.id").exists())
+						.andExpect(jsonPath("$.name").exists())
+						.andExpect(jsonPath("$.description").exists());
+		}
+
+	Veja que no método anterior, usamos o objectMapper.writeValueAsString(productDTO) para transformar o Objeto ProductDTO em Json, pois a requisição
+	assim exige. Para poder usar isso criamos o atritbuto na classe do tipo ObjectMapper anotado com @Autowired.
+
+	Já para enviar esse JSON como body da requisição, usamos o .content() juntamente com .contentType().
+	
+		@Test
+		public void updateShouldReturnNotFoundWhenIdDoesNotExcist() throws Exception {
+		
+			//Precisamos enviar o corpo da Request em formado JSON:
+			String jsonBody = objectMapper.writeValueAsString(productDTO);
+			
+			mockMvc.perform(put("/products/{id}", nonExistingId)
+					.content(jsonBody)
+					.contentType(MediaType.APPLICATION_JSON)
+					.accept(MediaType.APPLICATION_JSON))
+						.andExpect(status().isNotFound());
+		}

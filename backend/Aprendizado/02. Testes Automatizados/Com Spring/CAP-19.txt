@@ -1,0 +1,57 @@
+Nete capitulo aprendemos as Fixture de um teste, com ele melhoramos nosso código e evitamos repetições de codigo. Veja as anotações disponíveis que podemos usar em cima dos métodos:
+
+- JUnit 5 | JUnit 4 | Objetivo:
+
+@BeforeAll  | @BeforeClass | Preparação antes de todos testes da classe (método estático)
+
+@AfterAll   | @AfterClass  | Preparação depois de todos testes da classe (método estático)
+
+@BeforeEach | @Before      | Preparação antes de cada teste da classe 
+
+@AfterEach  | @After       | Preparação depois de cada teste da classe 
+
+
+- Usamos o @BeforeEeach na nossa classe ProductRepositoryTests, para antes de cada teste setar um valor nos atributos id e NonExistingId. Veja como ficou:
+
+@DataJpaTest
+public class ProductRepositoryTests {
+	
+	@Autowired
+	private ProductRepository repository;
+	
+	private Long id;
+	private Long nonExistingId;
+	
+	@BeforeEach
+	void setUp() throws Exception{
+		id = 1L;
+		nonExistingId = 1000L;
+	}
+	
+	@Test
+	public void deleteShouldDeleteObjcetWhenIdExists() {
+				
+		//Ação
+		repository.deleteById(id);
+		Optional<Product> result = repository.findById(id);
+		
+		//Comparação
+		Assertions.assertFalse(result.isPresent());
+		
+		
+	}
+	
+	@Test
+	public void deleteShouldThrowEmptyResultDataAccessExceptionWhenIdNoesNotExist() {
+		
+		//Comparação
+		Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+						
+			//Ação
+			repository.deleteById(nonExistingId);
+			
+		});
+		
+	}
+
+}

@@ -1,0 +1,54 @@
+Neste capitulo demos inicio ao teste de integração na camada web, no caso ProductResource (Controller):
+
+
+- Agora vamos bater em um endpoint (fazer requisição) e o fim da execução será lá no banco de dados.
+
+
+- Siga o passo a passo para criar o teste findAll() da classe ProductResource:
+
+	1) Criar a classe ProductResourceIT e anotá-la com @SpringBootTest, @AutoConfigureMockMvc e @Transactional
+
+	2) Criar o atributo do tipo MockMvc anotado com @Autowired;
+
+	3) Criar ainda na classe os atributos existingId, nonExistingId e countTotalProducts. Esses devem ser inicializados com valores no método setUp();
+
+	4) Criar o método findAllShouldReturnSortedPageWhenSortByName() anotado com @Test que será o teste.
+
+	5) Veja como ficou o código:
+
+		@SpringBootTest
+		@AutoConfigureMockMvc
+		@Transactional
+		public class ProductResourceIT {
+	
+			@Autowired
+			private MockMvc mockMvc;
+	
+			private Long existingId;
+			private Long nonExistingId;
+			private Long countTotalProducts;
+	
+			@BeforeEach
+			void setUp() throws Exception{
+				
+				existingId = 1L;
+				nonExistingId = 1000L;
+				countTotalProducts = 25L;
+			}
+	
+			@Test
+			public void findAllShouldReturnSortedPageWhenSortByName() throws Exception {
+		
+				mockMvc.perform(get("/products?page=0&size=12&sort=name,asc")
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isOk())
+					.andExpect(jsonPath("$.totalElements").value(countTotalProducts))
+					.andExpect(jsonPath("$.content").exists())
+					.andExpect(jsonPath("$.content[0].name").value("Macbook Pro"));
+	
+			}
+
+		}
+
+	Veja que o path no método .perform() é igual o digitado no postman.
+	E que no fim acessamos o retorno através do jsonPath("$.")

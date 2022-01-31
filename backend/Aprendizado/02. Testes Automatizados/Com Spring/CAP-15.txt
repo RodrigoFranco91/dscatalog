@@ -1,0 +1,50 @@
+Nete capitulo tivemos que alterar (refatorar) o método findAll() do nosso projeto que usa a Paginação, pois vai facilitar nossa vida.
+
+- Como estava antes:
+
+	//Controller - Resource
+	@GetMapping
+	public ResponseEntity<Page<ProductDTO>> findAll(
+			@RequestParam(value = "page", defaultValue = "0") Integer page,
+			@RequestParam(value = "linesPerPage", defaultValue = "12") Integer linesPerPage,
+			@RequestParam(value = "orderBy", defaultValue = "name") String orderBy,
+			@RequestParam(value = "direction", defaultValue = "ASC") String direction
+			) {
+		
+		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
+		Page<ProductDTO> list = service.findAllPaged(pageRequest);
+		return ResponseEntity.ok().body(list);
+	}
+
+	//Service
+
+	@Transactional(readOnly = true)
+	public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
+		Page<Product> list = repository.findAll(pageRequest);
+		//Page já é Stream, logo não precisamos .steam()
+		Page<ProductDTO> dto = list.map(ProductDTO::new);
+		return dto;
+	}
+
+- Como vai ficar:
+
+	//Controller - Resource
+	@GetMapping
+	public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
+		//PARAMETROS: page, size, sort
+		Page<ProductDTO> list = service.findAllPaged(pageable);
+		return ResponseEntity.ok().body(list);
+	}
+
+	//Service
+	@Transactional(readOnly = true)
+	public Page<ProductDTO> findAllPaged(Pageable pageable) {
+		Page<Product> list = repository.findAll(pageable);
+		//Page já é Stream, logo não precisamos .steam()
+		Page<ProductDTO> dto = list.map(ProductDTO::new);
+		return dto;
+	}
+
+	Tenha em mente que o cliente agora (lá no postman) pode passar os parametros com os nomes: page, size, sort (depois do sort podemos por ,asc ou 	,desc
+
+- Fizemos isso para categoria e product.

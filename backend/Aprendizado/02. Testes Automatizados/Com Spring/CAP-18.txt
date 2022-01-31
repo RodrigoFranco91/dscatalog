@@ -1,0 +1,22 @@
+Nete capitulo fizemos o teste de um Repository, no caso o delete, mas agora no cenário que tentamos deletar um id inexistente e esse cenário lança uma
+Exception:
+
+
+	1) Na classe ProductRepositoryTests criamos o método: 
+
+	@Test
+	public void deleteShouldThrowEmptyResultDataAccessExceptionWhenIdNoesNotExist() {
+		
+		//Comparação
+		Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+			
+			//Preparando cenário
+			Long NonExistingId = 1000L;
+			
+			//Ação
+			repository.deleteById(NonExistingId);
+			
+		});
+		
+	}
+

@@ -1,0 +1,23 @@
+Nete capitulo fizemos o teste de deleção do Service, mas agora passando um id dependente, pois quando isso ocorre uma Exception ocorre:
+
+
+	1) Criamos o atributo dependentId e o iniciamos no setUp() com valor 4l;
+
+	2) No setUp() configuramos o repository de ProdutoRepository para laçar a DataIntegrityViolationException com o seguinte código:
+
+		Mockito.doThrow(DataIntegrityViolationException.class).when(repository).deleteById(dependentId);
+
+	3) Criar o método deleteShouldThrowDataBaseExceptionWhenDependentId(), que ficará assim:
+
+		@Test
+		public void deleteShouldThrowDataBaseExceptionWhenDependentId() {
+		
+		
+			Assertions.assertThrows(DataBaseException.class, () ->{
+				service.delete(dependentId);
+			});
+		
+			Mockito.verify(repository).deleteById(dependentId);
+
+		}
+

@@ -1,0 +1,3 @@
+Nete capitulo implementamos fizemos o exercício de teste JUnit.
+
+Link do repositório da resolução: https://github.com/RodrigoFranco91/exercicio-junit-Devsuperior

@@ -1,0 +1,35 @@
+Nete capitulo fizemos o primeiro teste de um Repository, no caso o delete (esse teste vai levar em consideração o nosso seed, ou seja, o arquivo data.sql que povoa o nosso banco h2):
+
+
+	1) No pacote de testes do projeto dacatalog criar o subpacote repositories e dentro deste criar a classe ProductRepositoryTests;
+
+	2) Como só queremos testar o Repository isolado, não precisamos carregar o contexto completo do Spring, logo podemos anotar a classe 	ProductRepositoryTests com @DataJpaTest, dessa forma só vamos carregar o contexto do Spring Data JPA.
+
+	3) Vamos criar na classe ProductRepositoryTests o atributo ProductRespository e anotá-lo com @Autowired;
+
+	4) Vamos criar o método deleteShouldDeleteObjcetWhenIdExists() e este deve ser anotado com @Test. Nele vamos fazer o teste para ver se o delete
+	está funcionando. Veja como ficou a classe:
+
+		@DataJpaTest
+		public class ProductRepositoryTests {
+	
+			@Autowired
+			private ProductRepository repository;
+	
+			@Test
+			public void deleteShouldDeleteObjcetWhenIdExists() {
+		
+				//Preparando cenário
+				Long id = 1L;
+		
+				//Ação
+				repository.deleteById(id);
+				Optional<Product> result = repository.findById(id);
+		
+				//Comparação
+				Assertions.assertFalse(result.isPresent());
+		
+		
+			}
+
+		}

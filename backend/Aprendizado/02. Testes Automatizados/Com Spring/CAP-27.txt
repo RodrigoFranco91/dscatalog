@@ -1,0 +1,36 @@
+Nete capitulo aprendemos diversas simulações que podemos fazer com Mockito:
+
+
+- Na classe ProductServiceTest simulamos alguns comportamentos:
+
+	
+	- Para testar o método findAllPaged() da classe ProdctService, precisamos simular a chamada do metodo findAll() de ProductRepository 				que recebe como argumento um Pageable (tenha em mente que esse método tem retorno), portanto o método do Mockito para simular isso será o .when(), 		
+	veja como ficará:
+
+		Mockito.when(repository.findAll((Pageable)ArgumentMatchers.any())).thenReturn(page);
+
+	Veja que estamos passando como argumento para findAll() o objeto ArgumentMatchers.any(), e isso define que qualquer coisa que seja passado ao
+	método findAll() vai acionar a simulação. E veja que o retorno será um Page, que temos que criar, pois se o método é simulado precisamos simular
+	o retorno. Para isso criamos na classe os atributos:
+
+		private PageImpl<Product> page;
+		private Product product;
+	
+	E os iniciamos no método setUp():
+
+		product = Factory.createProduct();
+		page = new PageImpl<>(List.of(product));
+
+	Tenha em mente, que no lugar de ArgumentMatchers.any() poderiamos criar um Objeto Pageable e enviá-lo, assim somente quando o método finAll() 			receber aquele argumento que criamos é que vai disparar a simulação.
+
+
+	- Para testar tanto o método insert() quanto o update() de ProductService precisamos mockar o metodo save() do ProductRepository. Então fizemos:
+
+		Mockito.when(repository.save(ArgumentMatchers.any())).thenReturn(product);
+
+
+	- Para testar tanto o método findById() de ProductService precisamos mockar o metodo findById() do ProductRepository. Aqui temos dois, um que é
+	retornado um Optional preenchido e outro Optional vazio. Então fizemos:
+
+		Mockito.when(repository.findById(existingId)).thenReturn(Optional.of(product));
+		Mockito.when(repository.findById(nonExistingId)).thenReturn(Optional.empty());

@@ -1,0 +1,44 @@
+Nete capitulo se deu inicio sobre o teste de Unidade na classe Service e por isso foi introduzido o assunto de Mockito e MockBean:
+
+
+- Sabemos que a classe ProductService depende do ProductRepository e CategoryRepository (temos atributos desses tipos na classe ProductService) e como vamos
+fazer um teste de Unidade nessa classe? Se no teste a gente criar objeto do tipo ProductRepository e CategoryRepository estaremos fazendo um teste de
+Integração.
+
+
+- Para não ter que usar o objeto verdadeiro do tipo ProductRepository e CategoryRepository (as dependencias da classe) vamos ter que criar uma simulação
+desses objetos e isso nós chamamos de Mockar.
+
+
+- Vamos dar inicio ao teste, siga o passo a passo:
+
+	1) Criar a classe ProductServiceTests e anotá-la com @ExtendWith(SpringExtension.class). Essa classe foi criado no src de test no pacote service;
+
+	2) Criar na classe o atributo do tipo ProductService, pois teremos que chamá-lo pra testá-lo, mas esse atributo não pode receber @Autowired, pois
+	assim estariamos criando o objeto real, temos que anotá-lo com @InjectMocks do Mockito;
+
+	3) Sabemos que a classe ProductService usa as classes ProductRepository e CategoryRepository (dependencias), teremos então que criar um atributo
+	de cada tipo e anotá-lo com @Mock. Tenha em mente que a anotação poderia ser no lugar de @Mock a @MockBean
+
+	4) Veja como deixamos a classe até agora:
+
+		@ExtendWith(SpringExtension.class)
+		public class ProductServiceTests {
+
+			@InjectMocks
+			private ProductService service;
+	
+			@Mock
+			private ProductRepository productRepository;
+	
+			@Mock
+			private CategoryRepository categoryRepository;
+	
+		}
+
+
+- Diferença entre Mock e Mockbean:
+
+	- Mock vem diretamente do pacote do Mockito;
+	- MockBean vem do mockito que está no pacote do Spring;
+	- Devemos usar o Mock quando estamos fazendo teste sem subir o contexto do Spring e o MockBean quando estamos subindo o contexto.

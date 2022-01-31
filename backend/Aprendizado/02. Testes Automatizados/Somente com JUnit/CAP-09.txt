@@ -1,0 +1,17 @@
+Nete capitulo fizemos mais um teste, no caso passando um valor negativo para deposito:
+
+
+	@Test
+	public void depositShouldDoNothingWhenNegativeAmount() {
+		
+		//Arrange - preparando ambiente, o cenário
+		Double amount = -200.00;
+		Double expectedValue = 100.00;
+		Account acc = new Account(1L, 100.00);
+		
+		//Act - Ação
+		acc.deposit(amount);
+		
+		//Assert - Verificação:
+		Assertions.assertEquals(expectedValue, acc.getBalance());
+	}

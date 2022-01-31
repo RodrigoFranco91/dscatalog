@@ -1,0 +1,18 @@
+Nete capitulo falamos sobre TDD - Test Driven Development:
+
+
+- Método de desenvolver software, onde o desenvolvimento é guiado pelos testes.
+
+- Com ele focamos nos requisitos, pois vamos pensar o que é necessário para implementar aquela funcionalidade antes mesmo de colocar a mão no código;
+
+- Com tdd teremos confiança para refatorar o código;
+
+- Ciclo do TDD: 
+
+	1) Escreve o teste e este ainda vai falhar;
+	2) Implementa o código apenas para passar o código;
+	3) Refatore (melhore) seu código e já teremos um teste pronto para testar o cenário.
+
+	
+
+

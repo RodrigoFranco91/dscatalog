@@ -1,0 +1,53 @@
+Nete capitulo demos inicio o teste na camada Web (Resource/Controller):
+
+
+- Vamos criar testes para ProductResource, siga o passo a passo:
+
+	1) No src de test vamos criar o pacote dscatalog.resources e neste pacote criar a classe ProductResourceTests. Essa classe deve ser anotada com
+	@WebMvcTest(Classe.class), pois por enquanto só queremos testar a calsse ProductResource (teste de unidade) e as dependencias vamos Mockar;
+
+	2) Vamos criar um atributo do tipo MockMvc, é esse objeto que sabe fazer requisição HTTP, esse atributo deve ser anotado com @Autowired;
+
+	3) Sabemos que a classe ProductResource tem a dependencia por objetos do tipo ProductService, então temos que criar atributo do tipo ProductService
+	anotado com @Mockbean (estamos mockando com esse anotação, pois a classe foi anotada com @WebMvcTest e essa sobe o contexto Web do Spring);
+
+	4) Vamos testar o metodo findAll() da classe ProductResource, sabemos que esse método chama o findAllPaged() do ProductService, logo temos que
+	simular o comportamento deste método e vamos fazer isso dentro do método setUp() da nossa classe de test. O método findAllPaged() do ProductService
+	recebe como argumento um objeto Pageable  e retorna uma Page de productDto, portanto ainda temos que criar os atributos que ProductDTO e PageImpl
+	que farão parte da simulação (argumento e retorno);
+
+	5) Até o momento temos o seguinte código:
+
+		@WebMvcTest(ProductResource.class)
+		public class ProductServiceTest {
+	
+			@Autowired
+			private MockMvc mockMvc;
+	
+			@MockBean
+			private ProductService service;
+	
+			private PageImpl<ProductDTO> page;
+			private ProductDTO productDTO;
+	
+			@BeforeEach
+			void setUp() throws Exception{
+		
+				productDTO = Factory.createProductDTO();
+				page = new PageImpl<>(List.of(productDTO));
+		
+				Mockito.when(service.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
+		
+			}
+
+		}
+
+	6) Agora podemos criar o método de test, no caso vamos chamar de findAllShouldReturnPage() e anotá-lo com @Test. Seu conteúdo será:
+
+		@Test
+		public void findAllShouldReturnPage() throws Exception {
+			//Fazendo a requisição do tipo GET para /products (há import static aqui)
+			mockMvc.perform(get("/products")).andExpect(status().isOk());
+		}
+
+	Houve diversos import Static nesse código. Veja que o mockMvc.perform() é que faz a requisição que queremos.

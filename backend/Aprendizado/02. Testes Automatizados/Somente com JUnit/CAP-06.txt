@@ -1,0 +1,13 @@
+Nete capitulo falamos sobre o JUNIT 5:
+
+
+- Framework para testes em Java;
+
+- Atualmente estamos na versão 5 (Esta versão exige no mínimo Java 8);
+
+- Para usá-lo devemos criar uma classe Java, onde os métodos devem ser anotados com @Test e o retorno deve ser void. O objetivo é que os testes passem e para isso usamos os assertions para verificar o resultado obtido com o esperado.
+
+
+	
+
+

@@ -1,0 +1,3 @@
+Capitulo que foi apresentado o desafio que devemos fazer de TDD para finalizar o curso de testes.
+
+O repositório da resolução é: https://github.com/RodrigoFranco91/homework-2-devsuperior

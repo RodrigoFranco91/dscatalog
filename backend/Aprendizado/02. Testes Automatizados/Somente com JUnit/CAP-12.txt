@@ -1,0 +1,32 @@
+Nete capitulo implementamos o quarto teste, no caso testamos se a operação de sacar um valor vai de fato retirar do saldo do cliente. Agora temos dois
+cenários, um para que ocorrerá tudo certo e outro ao passar um valor maior que o saldo disparará uma exception. Temos que criar um método para cada cenário. Os metodos criados foram:
+
+	@Test
+	public void withdrawShouldDecreaseBalanceWhenSufficientBalance() {
+		
+		//Arrange - preparando ambiente, o cenário
+		Account acc = AccountFactory.createAccount(800.00);
+		
+		//Act - Ação
+		acc.withdraw(500.00);
+		
+		//Assert - Verificação:
+		Assertions.assertEquals(300.00, acc.getBalance());
+	}
+	
+	@Test
+	public void withdrawShouldThrowExceptionWhenInsufficientBalance() {
+		
+		//Assert - Verificação:
+		Assertions.assertThrows(IllegalArgumentException.class, () ->{
+			
+			//Arrange - preparando ambiente, o cenário
+			Account acc = AccountFactory.createAccount(800.00);
+			
+			//Act - Ação
+			acc.withdraw(801.00);
+		});
+	}
+
+	Veja que quando nosso valor esperado é uma Exception o código do teste muda um pouco, pois o assert de exception recebe dois argumentos, um é o 
+	tipo de Exception lançada e o outro uma expressão Lambda e nessa expressão colocamos o código que prepara o cenário e executa a ação do teste.

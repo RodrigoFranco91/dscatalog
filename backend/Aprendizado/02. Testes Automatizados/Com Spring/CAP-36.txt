@@ -1,0 +1,74 @@
+Nete capitulo demos inicio aos testes de integração:
+
+
+- São testes que testamos mais de um componente, ou seja, a conversa entre os componentes! 
+
+
+- Se vamos testar a classe X e ela tem a dependencia da classe Y, vamos testar X e Y, ou seja, não haverá simulação (mock) agora;
+
+
+- É um tipo de teste mais lento, pois precisamos carregar o contexto de todos componentes envolvidos e até por isso rodamos ele menos vezes!
+
+
+- Vamos criar nosso primeiro teste de integração. Vamos testar a classe ProductService que tem como dependencia o ProductRespository, mas agora nossa 
+execução vai descer até o banco de dados real (que estamos usando, no caso H2):
+
+	1) No src de test, no pacote dscatalog.services criar a classe ProductServiceIT e anotá-la com @SpringBootTest, pois com essa anotação vamos
+	subir todo o contexto do Spring;
+
+	2) Como queremos testar a classe ProductService, criamos um atributo desse tipo e agora anotamos o mesmo com @Autowired, pois agora queremos de
+	fato um objeto real deste tipo.
+
+	3) Vamos querer usar o ProductRepository para consultar o resultado no teste diretamente no banco, então vamos criar um atributo do tipo 
+	ProductRepository também anotado com @Autowired.
+
+	4) Vamos ainda criar 3 atributos da classe para nos auxiliar, o existingId, nonExistingId e countTotalProducts;
+
+	5) Vamos criar o método setUp() anotado com @BeforeEach e iniciar nossos atributos;
+
+	6) Criar um método de teste para cada cenário, o primeiro que consegue deletar, pois existe produto com id informado e o segundo onde será lançado
+	uma exception, pois não há produto com id informado.
+
+	7) Veja como ficou a classe:
+
+		@SpringBootTest
+		public class ProductServiceIT {
+			
+			@Autowired
+			private ProductService service;
+	
+			@Autowired
+			private ProductRepository repository;
+	
+			private Long existingId;
+			private Long nonExistingId;
+			private Long countTotalProducts;
+	
+			@BeforeEach
+			void setUp() throws Exception{
+		
+				existingId = 1L;
+				nonExistingId = 1000L;
+				countTotalProducts = 25L;
+		
+			}
+	
+			@Test
+			public void deleteShouldDeleteResourceWhenIdExists() {
+		
+				service.delete(existingId);
+		
+				Assertions.assertEquals(countTotalProducts - 1L, repository.count());
+		
+			}
+	
+			@Test
+			public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+		
+				Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+					service.delete(nonExistingId);
+				});
+		
+			}
+
+		}

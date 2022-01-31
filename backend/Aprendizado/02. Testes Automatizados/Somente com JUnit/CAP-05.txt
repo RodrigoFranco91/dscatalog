@@ -1,0 +1,17 @@
+Nete capitulo falamos sobre as Boas Práticas e Padrões em testes:
+
+
+- Deve haver uma nomeclatura para os testes, por exemplo: <AÇÃO> DEVERIA <EFEITO> WHEN <CENARIO>;
+
+- Padrão AAA, que é Arrange (monte o cenário ideal, de os new), Act (execute a ação), Assert(Compare o resultado encontrado com o esperado);
+
+- Utilize  a inversão de Dependência: Estamos testando a classe A, dentro dela não devemos fazer new classe B. Devemos usar a injeção de dependencia;
+
+- Os testes devem ser independentes e sem ordem;
+
+- Cada teste deve testar um cenário! Ser simples (sem IF's e Loops);
+
+- Resultado de um teste não pode depender de algo que varia, por exemplo timestamp ou valores aleatórios.
+	
+
+

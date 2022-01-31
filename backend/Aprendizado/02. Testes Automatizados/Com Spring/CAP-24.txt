@@ -1,0 +1,11 @@
+Nete capitulo falamos sobre o import do Mockito, que podemos fazer o mesmo com import Estatico e assim chamar seus métodos diretamente sem escrever Mockito.
+Podemos fazer isso também com Mockbean. Veja exemplo:
+
+		Mockito.verify(repository).deleteById(existingId);
+
+	Passa ser:
+
+		verify(repository).deleteById(existingId);
+
+
+

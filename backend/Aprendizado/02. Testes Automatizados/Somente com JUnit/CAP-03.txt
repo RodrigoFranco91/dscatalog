@@ -1,0 +1,3 @@
+Nete capitulo falamos sobre os beneficios dos testes:
+
+	- Com testes podemos detectar facilmente se uma mudança no projeto está violando as regras; É uma forma de documentação; Reduz o custo de 	manutenção; Melhora o design da nossa solução ( o código tem que ser simples e seguir padrões de projeto para ser testado).

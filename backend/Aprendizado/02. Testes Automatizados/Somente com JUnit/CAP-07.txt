@@ -1,0 +1,89 @@
+Nete capitulo fizemos o primeiro teste:
+
+- Criarmos um projeto java com a classe Account para simular um Banco Financeiro. Veja:
+
+public class Account {
+	
+	public static double DEPOSIT_FEE_PERCENTAGEM = 0.02;
+
+	private Long id;
+	private Double balance;
+	
+	
+	public Account() {
+	}
+
+
+	public Account(Long id, Double balance) {
+		this.id = id;
+		this.balance = balance;
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public Double getBalance() {
+		return balance;
+	}
+	
+	public void deposit(Double amount) {
+		if(amount > 0){
+			amount -= amount * DEPOSIT_FEE_PERCENTAGEM;
+			this.balance += amount;
+		}
+
+	}
+	
+	public void withdraw(Double amount) {
+		if(amount > balance) {
+			throw new IllegalArgumentException();
+		}
+		balance -= amount;
+	}
+	
+	public Double fullWithDraw() {
+		Double aux = this.balance;
+		this.balance = 0.0;
+		return aux;
+	}
+
+}
+
+- Vamos agora criar os testes dessa classe:
+
+
+	1) Criar nesse projeto, o pacote tests.entities e nela a classe AccountTests;
+
+	2) Criar o metodo que vai ver se o deposito faz o atibuto balance aumentar, para isso criamos o metodo 	depositShouldIncreaseBalanceWhenPositiveAmount() anotado com @Test. Veja que essa anotação não será reconhceida, precisamos adicionar o JUNIT no 
+	projeto. O Junit vem junto com a JDK, logo basta ir no build path do projeto e adicionar. Veja como ficou até agora:
+
+		public class AccountTests {
+
+			@Test
+			public void depositShouldIncreaseBalanceWhenPositiveAmount() {
+		
+				//Arrange - preparando ambiente, o cenário
+				Double amount = 200.00;
+				Double expectedValue = 196.00;
+				Account acc = new Account(1L, 0.0);
+		
+				//Act - Ação
+				acc.deposit(amount);
+				
+				//Assert - Verificação:
+				Assertions.assertEquals(expectedValue, acc.getBalance());
+			}
+	}
+
+	3) Basta rodar essa classe como JUnit Test que veremos o resultado.
+	
+
+

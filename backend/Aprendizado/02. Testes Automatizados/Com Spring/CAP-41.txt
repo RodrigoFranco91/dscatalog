@@ -1,0 +1,2 @@
+Foi apresentado como se resolve o desafio de TDD (O professor resolveu um problema parecido para aprendermos). Neste capitulo foi apresentado a solução do
+Desafio.

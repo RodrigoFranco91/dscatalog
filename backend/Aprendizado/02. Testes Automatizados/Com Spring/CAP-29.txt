@@ -1,0 +1,56 @@
+Nete capitulo foi apresentado o exercicio de testes de unidade com Mockito, no caso findById() e update() da classe ProductService:
+
+-FindById:
+
+	@Test
+	public void findByIdShouldReturnProductDTOWhenIdExists() {
+		
+		ProductDTO result = service.findById(existingId);
+		
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(existingId, result.getId());
+	}
+	
+	@Test
+	public void findByIdShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+		
+		Assertions.assertThrows(ResourceNotFoundException.class, () ->{
+			ProductDTO result = service.findById(nonExistingId);
+			
+		});
+	}
+
+
+- Update:
+
+	1) Criamos as simulações do repository (tanto de ProdutoRepository e CategoryRepository) que são dependencias da classe ProductService:
+
+		Mockito.doThrow(EntityNotFoundException.class).when(repository).getOne(nonExistingId);
+		Mockito.when(repository.getOne(existingId)).thenReturn(product);
+		Mockito.when(categoryRepository.getOne(categoryIdExisting)).thenReturn(category);
+
+	2) Criamos em Factory um método que cria Category para poder iniciar nossa variavel category;
+
+	3) Na classe ProductServiceTests criei o atributo category e categoryIdExisting
+
+	4) Os metodos de testes ficaram:
+
+	@Test
+	public void updateShouldReturnProructDTOWhenIdExistis() {
+		
+		ProductDTO result = service.update(existingId, productDTO);
+		
+		Assertions.assertNotNull(result);
+		Assertions.assertEquals(existingId, result.getId());
+		
+	}
+	
+	@Test
+	public void updateShouldThrowResourceNotFoundExceptionWhenIdDoesNotExists() {
+
+		Assertions.assertThrows(ResourceNotFoundException.class, () ->{
+			ProductDTO result = service.update(nonExistingId, productDTO);
+		});
+		
+	}
+

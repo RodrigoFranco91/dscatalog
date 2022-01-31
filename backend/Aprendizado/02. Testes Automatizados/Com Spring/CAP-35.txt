@@ -1,0 +1,97 @@
+Nete capitulo houve a proposta de exercicio de teste da camada web (ProductResource), no caso testamos os metodos insert() e o delete():
+
+Testes de Unidade desta mesma classe:
+
+- Insert:
+
+	1) Criamos a simulação do Service:
+
+		Mockito.when(service.insert(ArgumentMatchers.any())).thenReturn(productDTO);
+	
+	2) O metodo do teste ficou:
+
+	@Test
+	public void insertShouldReturnProductDTO() throws Exception {
+		
+		//Precisamos enviar o corpo da Request em formado JSON:
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		mockMvc.perform(post("/products")
+				.content(jsonBody)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isCreated())
+					.andExpect(jsonPath("$.id").exists());	
+				
+	}
+
+- Delete:
+
+	1) Usamos a simulação que ja tinhamos feito:
+
+		Mockito.doNothing().when(service).delete(existingId);
+		Mockito.doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
+
+	2) Os metodos de testes ficaram:
+
+	@Test
+	public void deleteShouldReturnNotFoundWhenIdDoesNotExcist() throws Exception{
+		
+		mockMvc.perform(delete("/products/{id}", nonExistingId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isNotFound());			
+	}
+	
+	@Test
+	public void deleteShouldReturnNoContentWhenIdExcist() throws Exception{
+		
+		mockMvc.perform(delete("/products/{id}", existingId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isNoContent());			
+	}
+
+|----------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+Testes de Integração desta mesma classe:
+
+- Insert:
+
+	@Test
+	public void insertShouldReturnProductDTO() throws Exception {
+		
+		ProductDTO productDTO = Factory.createProductDTO();
+		
+		//Precisamos enviar o corpo da Request em formado JSON:
+		String jsonBody = objectMapper.writeValueAsString(productDTO);
+		
+		mockMvc.perform(post("/products")
+				.content(jsonBody)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isCreated())
+					.andExpect(jsonPath("$.id").value(countTotalProducts + 1));
+		
+	}
+
+
+- Delete:
+
+	@Test
+	public void deleteShouldReturnNotFoundWhenIdDoesNotExcist() throws Exception{
+		
+		mockMvc.perform(delete("/products/{id}", nonExistingId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isNotFound());			
+	}
+	
+	@Test
+	public void deleteShouldReturnNoContentWhenIdExcist() throws Exception{
+		
+		mockMvc.perform(delete("/products/{id}", existingId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+					.andExpect(status().isNoContent());			
+	}

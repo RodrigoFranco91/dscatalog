@@ -1,0 +1,52 @@
+Nete capitulo fizemos o teste de integração do método findAllPaged() da classe ProductService:
+
+
+	1) Temos que ter em mente que cada método de teste deve ser independente do outro e isso ainda não está ocorrendo nos nossos testes, pois fizemos 
+	um teste de delete e esse de fato apagou o elemento do banco de dados, logo se o próximo teste depender desse elemento o mesmo vai falhar! Para
+	resolver isso poderiamos fazer um rollback no banco após cada método de teste e para fazer isso é simples, basta anotar a classe com @Transactional.
+
+	2) Vamos testar agora o findAllPaged() do ProductService. E para isso criamos os 3 métodos a seguir:
+
+	@Test
+	public void findAllPagedShouldReturnPageWhenPage0Size10() {
+		
+		PageRequest pageRequest = PageRequest.of(0, 10);
+		
+		Page<ProductDTO> result = service.findAllPaged(pageRequest);
+		
+		Assertions.assertFalse(result.isEmpty());
+		Assertions.assertEquals(0, result.getNumber());
+		Assertions.assertEquals(10, result.getSize());
+		Assertions.assertEquals(countTotalProducts, result.getTotalElements());
+	}
+
+	-> Aqui criamos um Pageable para começar na página 0 e 10 itens em cada página. E depois verificamos se a Página não estava vazia, se de fato 		estavamos na página 0, se havia 10 itens por página e se encontrou 25 elementos no total.
+	
+	@Test
+	public void findAllPagedShouldReturnEmptyPageWhenPageDoesNotExists() {
+		
+		PageRequest pageRequest = PageRequest.of(50, 10);
+		
+		Page<ProductDTO> result = service.findAllPaged(pageRequest);
+		
+		Assertions.assertTrue(result.isEmpty());
+
+	}
+
+	-> Aqui criamos um Pageable para começar na página 50 e 10 itens em cada página. E depois verificamos se a Página estava vazia, pois só temos 25
+	elementos no banco, logo a página 50 tem qeu ser vazia.
+	
+	@Test
+	public void findAllPagedShouldReturnSortedPageWhenSortedByName() {
+		
+		PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("name"));
+		
+		Page<ProductDTO> result = service.findAllPaged(pageRequest);
+		
+		Assertions.assertFalse(result.isEmpty());
+		Assertions.assertEquals("Macbook Pro", result.getContent().get(0).getName());
+		Assertions.assertEquals("PC Gamer", result.getContent().get(1).getName());
+		Assertions.assertEquals("PC Gamer Alfa", result.getContent().get(2).getName());
+	}
+
+	-> Aqui criamos um Pageable para começar na página 0, com 10 itens em cada página e ordenado por atributo name. E depois verificamos se a Página 		não estava vazia e verificamos os nomes dos produtos através do index.

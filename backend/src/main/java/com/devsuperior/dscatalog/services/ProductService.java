@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,7 @@ public class ProductService {
 	private ProductRepository repository;
 	
 	@Autowired
-	private CategoryRepository productRepository;
+	private CategoryRepository categoryRepository;
 
 	// Com isso eu garanto que todas operações no método findAll será executado na
 	// mesma transação.
@@ -87,8 +88,8 @@ public class ProductService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
-		Page<Product> list = repository.findAll(pageRequest);
+	public Page<ProductDTO> findAllPaged(Pageable pageable) {
+		Page<Product> list = repository.findAll(pageable);
 		//Page já é Stream, logo não precisamos .steam()
 		Page<ProductDTO> dto = list.map(ProductDTO::new);
 		return dto;
@@ -107,8 +108,8 @@ public class ProductService {
 		product.getCategories().clear();
 		
 		//Convertendo CategoriaDTO em categoria e depois colocando no Product
-		dto.getCategories().forEach(productDTO -> {
-			Category categoryEntity = productRepository.getOne(productDTO.getId());
+		dto.getCategories().forEach(categoryDTO -> {
+			Category categoryEntity = categoryRepository.getOne(categoryDTO.getId());
 			product.getCategories().add(categoryEntity);
 		});
 		

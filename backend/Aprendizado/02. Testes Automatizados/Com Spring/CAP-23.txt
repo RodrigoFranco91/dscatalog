@@ -1,0 +1,141 @@
+Nete capitulo fizemos o teste dp ProductService usando o Mockito para simular as dependencias:
+
+
+- Temos até o momento o a classe ProductServiceTest da seguinte forma:
+
+	@ExtendWith(SpringExtension.class)
+	public class ProductServiceTests {
+
+		@InjectMocks
+		private ProductService service;
+	
+		@Mock
+		private ProductRepository productRepository;
+	
+		@Mock
+		private CategoryRepository categoryRepository;
+	
+	}
+
+
+- Tenha em mente que não vamos acessar o Repository que vai acessar o banco de dados real! Vamos simular todo esse comportamento, ou seja, eu crio o objeto
+ProductRespository simulado (@Mock) e ainda simulo o retorno dos seus métodos que eu vou chamar no teste!
+
+
+- Testando o cenário de deleção, ou seja, o metodo delete() do ProductService:
+
+	1) Criamos o método deleteShouldDoNothingWhenIdExists() anotado com @Test;
+
+	2) Criamos o metodo setUp() anotado com @BeforeEach, aquele que é rodado antes de cada teste;
+
+	3) Criamos o atributo Long existingId e o inicializamos no setUp() com 1l;
+
+	4) Implementamos o metodo deleteShouldDoNothingWhenIdExists(), com seguinte código:
+
+		Assertions.assertDoesNotThrow(() ->{
+			service.delete(existingId);
+		});
+	
+	Se rodar aqui o teste passa, mas ele ainda não garante nada! Podemos verificar de fato se o método deleteById() do repository foi chamado, com o
+	seguinte código:
+
+		Mockito.verify(repository).deleteById(existingId);
+
+	Mas ainda falta algo extremamente importante! Simular o mock que estamos usando, nesse caso o mock do tipo ProductRepository e simular o que fazer
+	quando o método deleteById() for chamado. Fizemos isso dentro do método setUp():
+		
+		Mockito.doNothing().when(repository).deleteById(existingId);
+	
+	O código anterior estamos falando: não faça nada, quando o repository (ProductRepository) executar o método deleteById(existingId);
+	Tenha em mente que essa configurão só ocorrerá quando o metodo deleteById() for chamado e estiver recebendo o argumento existingId, quando o 	argumento for outro isso não funcionará.
+
+	A classe e o metodo ficou assim:
+
+		@ExtendWith(SpringExtension.class)
+		public class ProductServiceTests {
+
+			@InjectMocks
+			private ProductService service;
+	
+			@Mock
+			private ProductRepository repository;
+	
+			@Mock
+			private CategoryRepository categoryRepository;
+	
+			private Long existingId;
+	
+			@BeforeEach
+			void setUp() throws Exception{
+				existingId = 1L;
+				nonExistingId = 1000L;
+		
+				Mockito.doNothing().when(repository).deleteById(existingId);
+			}
+	
+			@Test
+			public void deleteShouldDoNothingWhenIdExists() {
+		
+		
+				Assertions.assertDoesNotThrow(() ->{
+					service.delete(existingId);
+				});
+		
+				//Verificando se o método deleteById() foi chamado, no caso do nosso objeto simulado (mockado)
+				Mockito.verify(repository).deleteById(existingId);
+		
+				//Verificando se o método deleteById() foi chamado duas vezes
+				//Mockito.verify(repository, Mockito.times(2)).deleteById(existingId);
+			}
+	
+		}
+
+	5) Podemos configurar o mock de ProductRepository para quando seu método deleteById() for chamado recebendo um valor de id inexistente (nesse caso
+	ocorre uma Exception). Para isso criamos o atributo nonExistingId e o iniciamos com 1000l no setUp(). Ainda no setUp configuramos com o seguinte
+	código:
+
+		Mockito.doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(nonExistingId);
+
+	Veja como ficou toda a classe:
+
+		@ExtendWith(SpringExtension.class)
+		public class ProductServiceTests {
+
+			@InjectMocks
+			private ProductService service;
+	
+			@Mock
+			private ProductRepository repository;
+	
+			@Mock
+			private CategoryRepository categoryRepository;
+	
+			private Long existingId;
+			private Long nonExistingId;
+	
+	
+			@BeforeEach
+			void setUp() throws Exception{
+				existingId = 1L;
+				nonExistingId = 1000L;
+		
+				Mockito.doNothing().when(repository).deleteById(existingId);
+				Mockito.doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(nonExistingId);
+			}
+	
+			@Test
+			public void deleteShouldDoNothingWhenIdExists() {
+		
+		
+				Assertions.assertDoesNotThrow(() ->{
+					service.delete(existingId);
+				});
+		
+				//Verificando se o método deleteById() foi chamado, no caso do nosso objeto simulado (mockado)
+				Mockito.verify(repository).deleteById(existingId);
+		
+				//Verificando se o método deleteById() foi chamado duas vezes
+				//Mockito.verify(repository, Mockito.times(2)).deleteById(existingId);
+			}
+	
+		}

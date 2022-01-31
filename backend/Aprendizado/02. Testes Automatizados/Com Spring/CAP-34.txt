@@ -1,0 +1,13 @@
+Neste capitulo fizemos outras simulações do objeto do tipo ProductService, pois esse é a dependencia do ProductResource (que é o que queremos testar). Veja
+os códigos:
+
+
+- Mockito.doNothing().when(service).delete(existingId);
+
+
+- Mockito.doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
+		
+
+- Mockito.doThrow(DataBaseException.class).when(service).delete(dependentId); Aqui criamos mais uma variável na classe, a dependentId e a inicializamos em
+setUp(); Lembre-se que os valores não importam, pois é tudo simulado!
+

@@ -1,0 +1,15 @@
+Nete capitulo implementamos o terceiro teste, no caso testamos se a operação de sacar tudo vai de fato zerar o saldo do cliente. O metodo criado foi:
+
+	@Test
+	public void fullWithDrawShouldClearBalance() {
+		
+		//Arrange - preparando ambiente, o cenário
+		Double expectedValue = 0.00;
+		Account acc = AccountFactory.createAccount(100.00);
+		
+		//Act - Ação
+		acc.fullWithDraw();
+		
+		//Assert - Verificação:
+		Assertions.assertEquals(expectedValue, acc.getBalance());
+	}

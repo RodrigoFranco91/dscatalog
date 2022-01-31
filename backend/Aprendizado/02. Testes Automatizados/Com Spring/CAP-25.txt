@@ -1,0 +1,23 @@
+Nete capitulo fizemos o teste de deleção do Service, mas agora passando um id inexistente, pois quando isso ocorre uma Exception ocorre:
+
+
+	1) O mock já está configurado no método setUp()
+
+	2) Criar o metodo deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNoExist(), que ficará assim:
+
+		@Test
+		public void deleteShouldThrowResourceNotFoundExceptionWhenIdDoesNoExist() {
+		
+		
+			Assertions.assertThrows(ResourceNotFoundException.class, () ->{
+				service.delete(nonExistingId);
+			});
+		
+			Mockito.verify(repository).deleteById(nonExistingId);
+
+		}
+
+	Aqui até o professor se confundiu, então atenção! A exception EmptyResultDataAccessException é lançada pelo ProductRepository (até usamos ela para
+	simular nosso objeto ProductRepository), já a classe service captura essa Exception e lança outra, lança a ResourceNotFoundException e é esta
+	que temos que esperar como resposta (Assertions)
+

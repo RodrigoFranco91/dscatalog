@@ -1,0 +1,6 @@
+Nete capitulo fizemos observações sobre o TDD
+	
+
+- O jeito que fizemos o capitulo 7 não é TDD, pois fizemos a lógica pra depois fazer o teste. Com TDD o teste é feito primeiro.
+
+
