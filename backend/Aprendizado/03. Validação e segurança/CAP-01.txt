@@ -1,0 +1,1 @@
+Neste capitulo foi apresentado o conteudo que vamos aprender sobre Autorização e Validação. Usaremos ainda o projeto Dscatalog.

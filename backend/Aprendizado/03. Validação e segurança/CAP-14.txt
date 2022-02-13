@@ -1,0 +1,69 @@
+No capítulo anterior criamos uma validação (ConstraintValidator) para verficar se o cliente não estava se cadastrando com um e-mail já em uso, mas a
+implementação da validação foi configuarada para a classe UserInsertDTO, ou seja, a operação de Update não haverá essa validação. Ao tentarmos fazer um 
+update e atualizar um email X para um email Y onde Y já está em uso teremos o erro 500, pois o banco de dados está configurado para ser e-mail unique, mas
+não queremos deixar vazar o erro 500, queremos validar e tratar esse erro também no update já na classe Resource/Controller.
+
+
+- Para isso vamos duplicar as classes UserInsertValid e UserInsertValidator e renomeá-las para: UserUpdateValid e UserUpdateValidator. Só que aqui teremos
+outro problema, não podemos configurar a classe UserUpdateValidator para aplicar a validação em UserDTO, pois UserInsertDTO é filha de UserDTO, logo haverá um  erro devido a herança. Teremos que criar um DTO só para update, e este será filho de UserDTO, e configurar a validação para ser aplicada em UserUpdateDTO.
+
+Siga os passos a seguir para refatorar todo nosso código com UserUpdateDTO:
+
+	1) Criei a classe UserUpdateValid ( copiei da UserInserValid), veja como ficou:
+
+		@Constraint(validatedBy = UserUpdateValidator.class)
+		@Target({ ElementType.TYPE })
+		@Retention(RetentionPolicy.RUNTIME)
+
+		public @interface UserUpdateValid {
+			String message() default "Validation error";
+
+			Class<?>[] groups() default {};
+
+			Class<? extends Payload>[] payload() default {};
+		}
+
+	2) Criei a classe UserUpdateValidator (copiei de UserInsertValidator), veja como ficou:
+
+		// Os argumentos são: A anotação e o tipo de Objeto que será anotado.
+		public class UserUpdateValidator implements ConstraintValidator<UserUpdateValid, UserUpdateDTO> {
+	
+			@Autowired
+			private UserRepository repository;
+	
+			@Override
+			public void initialize(UserUpdateValid ann) {
+			}
+
+			@Override
+			public boolean isValid(UserUpdateDTO dto, ConstraintValidatorContext context) {
+		
+				List<FieldMessage> list = new ArrayList<>();
+		
+				// Coloque aqui seus testes de validação, acrescentando objetos FieldMessage à lista
+				User user = repository.findByEmail(dto.getEmail());
+				if(user != null) {
+					list.add(new FieldMessage("email", "Email já existe"));
+				}
+		
+		
+				for (FieldMessage e : list) {
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(e.getMessage()).addPropertyNode(e.getFieldName())
+							.addConstraintViolation();
+				}
+				return list.isEmpty();
+			}
+		}
+
+	3) Criamos a classe UserUpdateDTO e anotamos a classe com @UserUpdateValid, veja:
+
+		@UserUpdateValid
+		public class UserUpdateDTO extends UserDTO{
+	
+
+		}
+
+	4) Nos metodos update() tanto de UserResource e UserService devemos mudar os tipos de argumento de UserDTO para UserUpdateDTO;
+
+	5) No próximo capitulo vamos de fato implementar a lógica em UserUpdateValidator.

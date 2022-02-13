@@ -1,0 +1,39 @@
+Neste capítulo ajustamos o arquivo pom.xml (dependencias) do nosso projeto para podermos implementar o OAuth2 com JWT:
+
+
+- A tag <properties> ficou assim:
+
+	<properties>
+		<java.version>11</java.version>
+		<spring-cloud.version>Hoxton.SR8</spring-cloud.version>
+	</properties>
+
+
+- Criamos a tag <dependencyManagement>:
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+
+- As seguintes dependencias foram adicionadas:
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security.oauth.boot</groupId>
+			<artifactId>spring-security-oauth2-autoconfigure</artifactId>
+		</dependency>

@@ -1,0 +1,134 @@
+Neste capítulo implementamos o checklist do Spring Security:
+
+
+- Relembrando o checklist:
+
+
+	1) Implementar algumas interfaces, no caso UserDetails e UserDetailsService
+
+	2) Criar a classe de configuração de segurança web, a classe deve ser filha de WebSecurityConfigurerAdapter
+
+	3) Criar um Bean do tipo AuthenticationManager para efetuar a autenticação.
+
+
+- Implementando a UserDetails:
+
+	1) Na classe User do pacote entities devemos implementar a interface UserDetails, ficando assim:
+
+		@Entity
+		@Table(name = "tb_user")
+		public class User implements UserDetails, Serializable{}
+
+	Lembre-se de implementar os métodos desta interface
+
+	2) Veja como ficou os métodos dessa interface:
+
+		@Override
+		public Collection<? extends GrantedAuthority> getAuthorities() {
+		return roles.stream().map(role -> new SimpleGrantedAuthority(role.getAuthority())).collect(Collectors.toList());
+		}
+
+		@Override
+		public String getUsername() {
+			return this.email;
+		}
+
+		@Override
+		public boolean isAccountNonExpired() {
+			return true;
+		}
+
+		@Override
+		public boolean isAccountNonLocked() {
+			return true;
+		}
+
+		@Override
+		public boolean isCredentialsNonExpired() {
+			return true;
+		}
+
+		@Override
+		public boolean isEnabled() {
+			return true;
+		}
+	
+
+- Implementando a UserDetailsService:
+
+	1) Vamos aproveitar a classe UserService, logo podemos fazer essa classe implementar a interface UserDetailsService, ficando assim:
+
+		@Service
+		public class UserService implements UserDetailsService {}
+
+	2) Devemos implementar os métodos da interface, ficando assim:
+
+		@Override
+		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+			User user = repository.findByEmail(username);
+			if(user == null) {
+				throw new UsernameNotFoundException("Email not found");
+			}
+			return user;
+		}
+
+	3) Não é obrigatório, mas é legal podermos printar Log's, então vamos criar um atributo na classe UserService do tipo Logger:
+
+		private Logger logger = LoggerFactory.getLogger(UserService.class);`
+
+	Tem que ser do pacote slf4j.
+
+	4) Agora podemos printar com o logger, veja:
+
+		@Override
+		public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+			User user = repository.findByEmail(username);
+			if(user == null) {
+				logger.error("User not found: " + username);
+				throw new UsernameNotFoundException("Email not found");
+			}
+			logger.info("User found: " + username);
+			return user;
+		}
+
+
+- Implementando a classe filha de WebSecurityConfigurerAdapter:
+
+	1) Já criamos a classe SecurityConfig no pacote config que extend WebSecurityConfigurerAdapter, pois só de por o Spring Security no projeto todos 		endpoints foram bloqueados, então criamos essa classe para liberar os endpoints. Mas agora vamos criar mais configurações;
+
+	2) Renomeamos a classe SecurityConfig para WebSecurityConfig;
+
+	3) O método configure(WebSecurity web) deve agora ficar assim (liberando todos endpoints):
+	
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			web.ignoring().antMatchers("/actuator/**");
+		}
+
+	4) Agora precisamos implementar o método configure(AuthenticationManagerBuilder). Neste método vamos configurar o Encriptador que estamos usando e
+	indicar o UserDetailService. Para isso precisamos criar os atributos nesta classe:
+
+		@Autowired
+		private BCryptPasswordEncoder passwordEncoder;
+	
+		@Autowired
+		private UserDetailsService userDetailsService;
+
+	E o método ficará assim:
+
+		@Override
+		protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+			auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+		}
+
+
+- Implementando Bean de AuthenticationManager:
+
+	1) Na classe WebSecurityConfig devemos implementar o método authenticationManager() e anotar esse metodo com @Bean, ficando assim:
+
+		@Override
+		@Bean
+		protected AuthenticationManager authenticationManager() throws Exception {
+			return super.authenticationManager();
+		}
+

@@ -1,0 +1,22 @@
+Neste capítulo começamos a falar de segurança, no caso sobre token JWT, autenticação e autorização.
+
+Foi sugerido assistir o video: https://www.youtube.com/watch?v=n1z9lx4ymPM
+
+
+- Comentamos um pouco sobre o MVC Template Engine, que no caso é um modo de construir aplicação Web em camadas (Model - View - Controller) e que nessa
+arquitetura normalmente se usa uma biblioteca chamada de Template Engine que é para criar telas, no caso usaremos a linguagem de programação para criar
+as telas web (O template engine pega o código na linguagem e criar um conteudo HTML), neste cenário o Back-end não está totalmente separado do Front-end. Já quando temos um Web Service há uma sepacação maior do Back-end com Front-End, e o Backend não responde mais uma página html e sim dados (JSON).
+
+Em aplicações MVC Template Engine usavamos Session para guardar o usuário logado (autenticado), já no Web Service não usamos Session, pois agora há duas aplicações (Fron e Back-end) e neste cenário podemos usar um Token para autenticar o usuário e uma opção é o JWT Token.
+
+
+- Um JWT Token é composto em 3 partes, (HEAD, Payload e Signature), onde no HEAD há informações como Algoritmo de criptografia, no Payload podemos saber
+o usuário, sua role e data de criação e expiração do token. Já na assinatura é onde há a segurança de fato, pois cada assinatura é unica por aplicação, logo
+poderemos verificar se a assinatura do token é de fato a assinatura usada na aplicação que queremos nos autenticar (assinatura no caso embaralha o token de
+tal maneira que só uma aplicação vai conhecer)
+
+
+- Autenticação = Sistema verifica quem você é; Momento que usuário informa sua senha e o sistema verifica se você de fato existe.
+
+
+- Autorização = Vai além da autenticação, no caso é a permissão de cada usuário logado; O que eu posso fazer no sistema?

@@ -1,0 +1,23 @@
+Neste capítulo falamos sobre o OAuth2:
+
+
+- O OAuth 2.0 é um protocolo para Autorização. Permite que aplicativos (mobile, web, etc..) se autentique em outros aplicativos.
+
+
+- No OAuth temos alguns autores:
+
+	1) Servidor de Autorização:  É a aplicação que recebe credenciais do usuario (user e senha) e as credenciais da aplicação, autentica o usuário e 	retorna um token assinado ou um erro tipo 401 - Bad Credencial. (É engraçado, mas o servidor de autorização na verdade faz uma autenticação.)
+
+	2) Servidor de Recurso: É a aplicação que de fato tem os recursos (CRUD ou outra operação) que queremos executar. Temos que enviar o token para
+	realizar a operação e de acordo com a role do token enviado a operação podera ou não ser executada (ou seja, aqui ocorre um tipo de autorização)
+
+	3) Client: Aplicação que acessará o Servidor de Autorização para ganhar o token e acessa Servidor de Recurso para realizar uma operação (podemos
+	classificar no nosso caso como Client o Postman ou ourtra app rodando na maquina do usuário)
+
+	- Tenha em mente que podemos fazer a mesma aplicação ser o Servidor de Autorização e Servidor de Recurso ou então criar uma aplicação para cada,
+	ou então usar como Servidor de Autorização aplicações como Gmail, Facebook, etc...
+
+	- Tenha em mente que se fizermos separadamente o Servidor de Autorização e Servidor de Recurso, ambos terão que conhecer o Secret do JWT.
+
+
+- Nosso projeto, o dscatalog será ao mesmo tempo Servidor de Autorização e Servidor de Recurso.

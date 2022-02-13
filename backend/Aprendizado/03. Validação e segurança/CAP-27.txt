@@ -1,0 +1,33 @@
+Neste capítulo fizemos uma configuração para Liberar o acesso ao Console do Banco H2:
+
+
+- Ao aplicar o Spring Security em nosso projeto perdemos o acesso ao console do banco H2. Vamos liberar:
+
+	1) Na classe ResourceServerConfig, no vetor PUBLIC vamos adicionar o path /h2-console/**. Veja como ficou:
+
+		private static final String[] PUBLIC = {"/oauth/token", "/h2-console/**"};
+
+	2) Mas só isso não basta, vamos precisar criar um atributo do tipo Environment anotado com @Autowired, pois com ele podemos acessar as variaveis
+	de ambiente que está sendo usada em nossa aplicação. Veja:
+
+		@Autowired
+		private Environment env;
+	
+	3) Agora no método configure(HttpSecurity http) vamos usar o env para ver se estamos no ambiente de teste, se estivermos temos que desabilitar o
+	FrameOptions. Veja como ficou esse método:
+
+		@Override
+		public void configure(HttpSecurity http) throws Exception {
+		
+			//Config para liberar o console do H2 em ambiente de teste
+			if(Arrays.asList(env.getActiveProfiles()).contains("test")){
+				http.headers().frameOptions().disable();
+			}
+		
+			http.authorizeRequests()
+			.antMatchers(PUBLIC).permitAll()
+			.antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll()
+			.antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN")
+			.antMatchers(ADMIN).hasRole("ADMIN")
+			.anyRequest().authenticated();
+		}

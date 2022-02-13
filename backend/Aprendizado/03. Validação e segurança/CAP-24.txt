@@ -1,0 +1,60 @@
+Neste capítulo alteramos a configuração da implementação do checklist do OAuth2 - Servidor de Autorização (Authorization Server). Agora vamos exerternalizar
+a configuração via Variáveis de Ambiente, ou seja, valores por exemplo do withClient("dscatalog") e do secret(passwordEncoder.encode("dscatalog123")) não vão mais ficar diretamente no código e sim em um arquivo:
+
+
+- No arquivo application.properties é onde fazemos essa configuração. Podemos deixar nesse aquivo o valor da váriavel ou então uma referencia de onde pegar
+o valor (variável de ambiente). Veja como ficou o arquivo application.properties:
+
+	spring.profiles.active=${APP_PROFILE:test}
+
+	spring.jpa.open-in-view=false
+
+	security.oauth2.client.client-id=${CLIENT_ID:dscatalog}
+	security.oauth2.client.client-secret=${CLIENT_SECRET:dscatalog123}
+
+	jwt.secret=${JWT_SECRET:MY-JWT-SECRET}
+	jwt.duration=${JWT_DURATION:86400}
+
+	Tenha em mente: para definir o profile de nossa aplicação é através da propriedade spring.profiles.active e seu valor agora será o valor passado na
+	variável de ambiente APP_PROFILE, caso essa variável de ambiente não seja definida (enviada) o valor padrão será test. Fizemos isso para outros 	valores, ou seja, recebendo por viariável de ambiente ou tendo um valor padrão para quando a variável não é passada.
+
+
+- Agora no nosso código temos que pegar os valores declarados no arquivo application.properties:
+
+	1) Na classe AppConfig criamos o atributo jwtSecret anotado com @Value("${jwt.secret}"), dessa forma o atributo pega o valor lá do arquivo 	application.properties da propertie com o nome jwt.secret. Basta agora no código substituir o "MY-JWT-SECRET por jwtSecret. Veja como ficou:
+
+		@Value("${jwt.secret}")
+		private String jwtSecret;
+
+		@Bean
+		public JwtAccessTokenConverter accessTokenConverter() {
+			JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
+			tokenConverter.setSigningKey(jwtSecret);
+			return tokenConverter;
+		}
+
+	2) Na classe AuthorizationServerConfig criamos os atributos:
+
+		@Value("${security.oauth2.client.client-id}")
+		private String clientId;
+	
+		@Value("${security.oauth2.client.client-secret}")
+		private String clientSecret;
+	
+		@Value("${jwt.duration}")
+		private Integer jwtDuration;
+
+	E o método usando esses atributos vai ficar:
+
+		//Credenciais do APP. O frontend vai precisar desses dados
+		@Override
+		public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+			clients.inMemory()
+			.withClient(clientId)
+			.secret(passwordEncoder.encode(clientSecret))
+			.scopes("read", "write")
+			.authorizedGrantTypes("password")
+			.accessTokenValiditySeconds(jwtDuration);
+		}
+
+- Testar se o Token ainda está sendo gerado.

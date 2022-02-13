@@ -1,0 +1,26 @@
+Neste capítulo tratamos a Exception MethodArgumentNotValidException:
+
+
+- Siga o passo a passo:
+
+	1) Na classe ResourceExceptionHandler vamos criar o método chamado validation(). Esse método deve ser anoatado com @ExceptionHandler(value = 	MethodArgumentNotValidException.class);
+
+	2) Veja como ficará o método:
+
+		 // Neste cenário podemos retornar o 422 - Unprocessable Entity ou 404 - Bad Request
+		@ExceptionHandler(value = MethodArgumentNotValidException.class)
+		public ResponseEntity<StandardError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
+			StandardError err = new StandardError();
+			err.setTimestamp(Instant.now());
+			err.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+			err.setError("Validation Exception");
+			err.setMessage(e.getMessage());
+			err.setPath(request.getRequestURI());
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err);
+		}
+
+	Veja que estamos retornando agora um Status 422 quando a exception MethodArgumentNotValidException: é lançada. Poderiamos também retornar um 404.
+
+
+- Do jeito que está a mensagem de erro ainda é muito grande, pois estamos pegando aquela mensagem que estoura lá na IDE. No próximo capitulo vamos criar
+uma mensagem melhor para informar o erro da validação.

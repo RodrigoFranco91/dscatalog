@@ -1,0 +1,69 @@
+Neste capítulo demos inicio ao CRUD de User:
+
+
+- Criamos o RepositoryUser e o RoleRepository;
+
+- Criamos o UerDTO:
+
+		public class UserDTO {
+	
+			private Long id;
+			private String firstName;
+			private String lastName;
+			private String email;
+
+			private Set<RoleDTO> roles = new HashSet<>();
+	
+			public UserDTO() {
+
+			}
+
+			public UserDTO(Long id, String firstName, String lastName, String email) {
+				this.id = id;
+				this.firstName = firstName;
+				this.lastName = lastName;
+				this.email = email;
+			}
+	
+	
+			public UserDTO(User entity) {
+				this.id = entity.getId();
+				this.firstName = entity.getFirstName();
+				this.lastName = entity.getLastName();
+				this.email = entity.getEmail();
+				this.roles = entity.getRoles().stream().map(RoleDTO::new).collect(Collectors.toSet());
+				//Na classe User, a anotação @ManyToMany ficou com (fetch = FetchType.EAGER), logo sempre teremos a lista de Roles 				// preenchida, logo podemos pegar aqui essa lista!
+			}
+
+			//GETTERS E SETTERS	
+
+		}
+
+- Criamos o RoleDTO:
+
+		public class RoleDTO implements Serializable {
+
+			private static final long serialVersionUID = 1L;
+	
+			private Long id;
+			private String authority;
+			
+			public RoleDTO() {
+		
+			}
+
+			public RoleDTO(Role role) {
+				this.id = role.getId();
+				this.authority = role.getAuthority();
+			}
+
+			public RoleDTO(Long id, String authority) {
+				this.id = id;
+				this.authority = authority;
+			}
+
+			//GETTERS E SETTERS
+		}
+
+
+- Criamos a classe UserService.

@@ -1,0 +1,94 @@
+Neste capítulo aprendemos a criar uma validação com ConstraintValidator, neste tipo de validação há "regras de negócio", podemos até mesmo fazer consultas
+no banco de dados. Um exemplo é não permitir uma requisição de cadastro com um e-mail já usado por outro cliente. Siga os passos para fazer esse tipo
+de validação:
+
+	1) No pacote services criar o paocte validation
+
+	2) No pacote validation criar a @interface UserInsertValid. Ficará assim:
+
+		import java.lang.annotation.ElementType;
+		import java.lang.annotation.Retention;
+		import java.lang.annotation.RetentionPolicy;
+		import java.lang.annotation.Target;
+
+		import javax.validation.Constraint;
+		import javax.validation.Payload;
+
+		@Constraint(validatedBy = UserInsertValidator.class)
+		@Target({ ElementType.TYPE })
+		@Retention(RetentionPolicy.RUNTIME)
+
+		public @interface UserInsertValid {
+			String message() default "Validation error";
+
+			Class<?>[] groups() default {};
+
+			Class<? extends Payload>[] payload() default {};
+		}
+	
+	Agora já temos a nossa anotação UserInsertValid, e poderemos colocar @UserInsertValid em cima dos atributos ou classe.
+	
+	3) Veja que no passo anterior, no @Constraint usamos a classe  UserInsertValidator, temos que criar esta classe, então no mesmo pacote, no
+	validation criar a classe  UserInsertValidator. Ficará assim:
+
+		import java.util.ArrayList;
+		import java.util.List;
+
+		import javax.validation.ConstraintValidator;
+		import javax.validation.ConstraintValidatorContext;
+
+		import com.devsuperior.dscatalog.dto.UserInsertDTO;
+		import com.devsuperior.dscatalog.resources.exceptions.FieldMessage;
+
+		// Os argumentos são: A anotação e o tipo de Objeto que será anotado!!!!!!!!!
+		public class UserInsertValidator implements ConstraintValidator<UserInsertValid, UserInsertDTO> {
+	
+			@Override
+			public void initialize(UserInsertValid ann) {
+			}
+
+			@Override
+			public boolean isValid(UserInsertDTO dto, ConstraintValidatorContext context) {
+		
+				List<FieldMessage> list = new ArrayList<>();
+		
+				// Coloque aqui seus testes de validação, acrescentando objetos FieldMessage à lista
+		
+				for (FieldMessage e : list) {
+					context.disableDefaultConstraintViolation();
+					context.buildConstraintViolationWithTemplate(e.getMessage()).addPropertyNode(e.getFieldName())
+							.addConstraintViolation();
+				}
+				return list.isEmpty();
+			}
+		}
+
+	4) Na classe UserInsertDTO devemos colocar a anotação @UserInsertValid, veja:
+
+		@UserInsertValid
+		public class UserInsertDTO extends UserDTO{}
+
+	5) Mas ainda não fizemos a lógica da validação, então na classe UserInsertValidator, dentro do método isValid() vamos escrever:
+
+		@Override
+		public boolean isValid(UserInsertDTO dto, ConstraintValidatorContext context) {
+		
+			List<FieldMessage> list = new ArrayList<>();
+		
+			// Coloque aqui seus testes de validação, acrescentando objetos FieldMessage à lista
+			User user = repository.findByEmail(dto.getEmail());
+			if(user != null) {
+				list.add(new FieldMessage("email", "Email já existe"));
+			}
+		
+		
+			for (FieldMessage e : list) {
+				context.disableDefaultConstraintViolation();
+				context.buildConstraintViolationWithTemplate(e.getMessage()).addPropertyNode(e.getFieldName())
+						.addConstraintViolation();
+			}
+			return list.isEmpty();
+		}
+
+	Criamos na classe UserInsertValidator um atributo do tipo UserRepository anotado com @Autowired. E na interface UserRepository  criamos o método
+	findByEmail().

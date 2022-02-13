@@ -1,0 +1,77 @@
+Neste capítulo demos continuidade ao CRUD de User e discutimos sobre o password, no caso recebe-lo por DTO e passá-lo pra entidade:
+
+
+- Criamos um DTO especial, específico para carregar o password e usamos herança para isso, veja:
+
+	1) Criamos a classe UserInsertDTO sendo filha de UserDTO:
+
+		public class UserInsertDTO extends UserDTO{
+	
+			private String password;
+	
+	
+			public UserInsertDTO() {
+				super();
+			}
+
+			public String getPassword() {
+				return password;
+			}
+
+			public void setPassword(String password) {
+				this.password = password;
+			}
+
+		}
+
+
+- Devemos alterar o metodo insert() da classe UserService, este agora deve receber um argumento do tipo UserInsertDTO. Só que vamos precisar ainda usar
+o BCrypt para encriptografar a senha e este módulo está no Spring Security. Siga os passos para fazer tudo isso:
+
+	1) No arquivo pom.xml adicionar:
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+	2) Criar um Bean do BCrypt, então no pacote principal da aplicação vamos criar o pacote config e vamos criar a classe AppConfig:
+
+		@Configuration
+		public class AppConfig {
+	
+			@Bean
+			public BCryptPasswordEncoder passwordEncoder() {
+				return new BCryptPasswordEncoder();
+			}
+	
+		}
+
+	3) Na classe UserService agora podemos criar o atributo do tipo BCryptPasswordEncoder anotado com @Autowired:
+
+		@Autowired
+		private BCryptPasswordEncoder passwordEncoder;
+
+	4) No metodo insert() da classe UserService podemos agora usar BCrypt e para isso deve ficar assim:
+
+		@Transactional
+		public UserDTO insert(UserInsertDTO dto) {
+			User user = new User();
+			copyDtoToEntity(dto, user);
+			user.setPassword(passwordEncoder.encode(dto.getPassword()));
+			user = repository.save(user);
+			return new UserDTO(user);
+		}
+
+	5) Só de colocar a dependencia do Security todos endpoints nossos ficaram protegidos, para desprotege-los provisoriamente devemos criar no pacote
+	config a classe SecurityConfig com seguinte conteudo:
+
+		@Configuration
+		@EnableWebSecurity
+		public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+			@Override
+			public void configure(WebSecurity web) throws Exception {
+				web.ignoring().antMatchers("/**");
+			}
+		}

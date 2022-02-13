@@ -1,0 +1,6 @@
+Neste capítulo nos foi informado que em outros cursos vamos abordar outros tópicos sobre autenticação e autorização, por exemplo:
+
+	- Autorização em nivel de serviço, ou seja, Usuário só pode acessar user/id somente se o id for o dele. Admin acessa de todos;
+	- Conteúdo para o usuário logado, por exemplo ao acessar /notifications deve-se exibir notificações do usuário logado (somente as que são pra ele);
+	- Refresh Token, que é um token auxiliar para se obter um novo token válido;
+	- Pré-autorizando métodos através do perfil de usuário.

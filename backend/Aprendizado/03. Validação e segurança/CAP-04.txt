@@ -1,0 +1,44 @@
+Neste capitulo implementamos as entidades User e Role e aproveitamos para terminar o relacionamento bidirecional de Product com Category (só fizemos o mapedBy):
+
+
+- Criando a entidade role:
+
+	1) No pacote entities criar a classe Role:
+
+		public class Role implements Serializable{
+
+			private static final long serialVersionUID = 1L;
+	
+			private Long id;
+			private String authority;
+		
+			//Construtor com argumentos,
+			//Construtor sem argumentos,
+			//Getters e Setters,
+			//Equal e Hashcode.			
+
+		}
+
+
+- Criando a entidade User:
+
+	1) No pacote entities criar a classe User:
+
+		public class User implements Serializable{
+
+			private static final long serialVersionUID = 1L;
+
+			private Long id;
+			private String firstName;
+			private String lastName;
+			private String email;
+			private String password;
+	
+			private Set<Role> roles = new HashSet<>();
+
+			//Construtor com argumentos,
+			//Construtor sem argumentos,
+			//Getters e Setters,
+			//Equal e Hashcode.			
+
+		}

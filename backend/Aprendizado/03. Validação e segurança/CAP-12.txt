@@ -1,0 +1,65 @@
+Neste capítulo criamos uma mensagem personalizada para o Client quando ocorre a Exception MethodArgumentNotValidException:
+
+
+- Veja que no método valitadion() na classe ResourceExceptionHandler estamos retornando um Response Entity de StandardError. Vamos trocar o StandardError
+por: ValidationError
+
+
+- Teremos também que percorrer todos os atributos de Erro que ocorreu na Exception MethodArgumentNotValidException;
+
+
+- Siga o passo a passo para implementar isso:
+
+	1) No pacote exceptions criar a classe FieldMessage, esta será a "casca"que vai guardar o campo de erro da validação e a mensagem descitiva deste 
+	erro. Veja como ficou a classe:
+
+		public class FieldMessage implements Serializable{
+
+			private static final long serialVersionUID = 1L;
+	
+			private String fieldName;
+			private String message;
+
+			// Construtor com e sem argumento;
+			// Getters e Setters;
+		}
+
+	2) No Pacote exceptions criar a classe ValidationError, que deve ser filha de StandarError e ter uma lista de FieldMessage. Veja como ficou a 	classe:
+
+		public class ValidationError extends StandardError{
+
+			private static final long serialVersionUID = 1L;
+	
+			private List<FieldMessage> errors = new ArrayList<>();
+	
+			public List<FieldMessage> getErrors() {
+				return errors;
+			}
+	
+			public void addError(String fieldName, String message) {
+				errors.add(new FieldMessage(fieldName, message));
+			}
+	
+		}
+
+	3) Agora o metodo valitadion() na classe ResourceExceptionHandler deve ficar:
+
+		 // Neste cenário podemos retornar o 422 - Unprocessable Entity ou 404 - Bad Request
+		@ExceptionHandler(value = MethodArgumentNotValidException.class)
+		public ResponseEntity<ValidationError> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
+			ValidationError err = new ValidationError();
+			err.setTimestamp(Instant.now());
+			err.setStatus(HttpStatus.UNPROCESSABLE_ENTITY.value());
+			err.setError("Validation Exception");
+			err.setMessage(e.getMessage());
+			err.setPath(request.getRequestURI());
+		
+			for (FieldError f : e.getBindingResult().getFieldErrors()) {
+				err.addError(f.getField(), f.getDefaultMessage());
+			}
+			
+			return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(err);
+		}
+
+
+- Agora quando um rquest falhar devido a validação o client recebera um 422 junto com uma mensagem personalizada do motivo da falha.

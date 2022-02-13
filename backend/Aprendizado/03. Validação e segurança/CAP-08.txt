@@ -1,0 +1,12 @@
+Neste capítulo demos continuidade ao CRUD de User, no caso criamos o UserResource (Controller):
+
+
+- Criamos a classe UserResource;
+
+
+- Na classe User, alteramos o atributo email, ficando assim:
+
+	@Column(unique = true)
+	private String email;
+
+Tenha em mente que agora o e-mail tem que ser único, mas essa validação está sendo feita no banco de dados! Vamos aprender a fazer na aplicação.

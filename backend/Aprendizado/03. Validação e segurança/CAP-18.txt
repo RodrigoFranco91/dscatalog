@@ -1,0 +1,9 @@
+Neste capítulo entendemos como será o processo de Login do nosso projeto:
+
+
+- Implementando o Servidor de Autorização:
+
+	- O cliente (aquele que faz a request) tem que passar na request as credenciais de usuário (username, password, grant_type) assim como as 		credenciais do app no caso (client_id e client_secret). As credenciais do app são passados via cabeçalho da request (header), o cabeçalho fica 		assim: key = Authorization. Value = "Basic " + Base64.encode(client_id + ":" + client_secret).
+
+	- Ao fazer a request passando os dados informados anteriormente o Servidor de Autorização retornará o Token JWT (Esse token tem Signature, Claims,
+	e expiration).

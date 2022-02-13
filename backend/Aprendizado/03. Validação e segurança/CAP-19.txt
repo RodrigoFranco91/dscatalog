@@ -1,0 +1,8 @@
+Neste capítulo fizemos um check-list do que teremos que fazer para implementar o Spring Security:
+
+
+	1) Implementar algumas interfaces, no caso UserDetails e UserDetailsService
+
+	2) Criar a classe de configuração de segurança web, a classe deve ser filha de WebSecurityConfigurerAdapter
+
+	3) Criar um Bean do tipo AuthenticationManager para efetuar a autenticação.

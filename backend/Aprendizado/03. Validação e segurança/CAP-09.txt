@@ -1,0 +1,11 @@
+Neste capítulo nos foi apresentado o Bean Validation:
+
+- É uma biblioteca de validação;
+
+
+- Aqui temos todas anotações prontas, que podemos usar:
+
+	https://javadoc.io/doc/javax.validation/validation-api/latest/index.html
+
+
+- Nos foi apresentado sites que possuem Regex e que deixam testá-los.

@@ -1,0 +1,33 @@
+Neste capítulo configuramos o Postman para facilitar nossa vida. No caso vamos fazer a requisição para se autenticar e o retorno do Token já cairá como
+parametro das outras requisições...
+
+
+- Veja como fazer:
+
+	1) No Environment do Postman chamado de dscatalog-bootcamp-local vamos adicionar as seguintes varáveis e valores:
+
+		client-id dscatalog
+		client-secret dscatalog123
+		username alex@gmail.com
+		password 123456
+		token
+	
+	Veja que o valor de token é vazio, depois vamos criar um script para pegá-lo.
+
+	2) Agora na request de login, na aba Authorization vamos colocar em Username = {{client-id}} e em Password = {{client-secret}}
+
+	3) Ainda na request de login, mas agora na aba Body vamos colocar em Username = {{username}} e em Password = {{password}}
+
+	4) Agora devemos em todas as as outras request ir na aba Authorization, deixar o Type em Bearer Token e no campo Token deixar com {{token}}
+
+	5) Agora vamos criar um script que o retorno da request localhost:8080/oauth/token (é a mesma que {{host}}/oauth/token) será atribuido a váriavel
+	de ambiente token. Para fazer isso devemos ir na request do login -> na aba Test -> Colocar o código a seguir:
+
+		if (responseCode.code >= 200 && responseCode.code < 300) {
+   			var json = JSON.parse(responseBody);
+   			postman.setEnvironmentVariable('token', json.access_token);
+		}
+
+	6) Agora podemos rodar a resquet de Login e depois rodar qualquer outra request sem ter que copiar o token e adicionaá-lo (isso é feito 	automaticamente)
+
+	7) Quando for agora mudar um valor de usuário (User e Password) é recomendável mudarmos somente nas Variáveis de Ambiente do Postman.

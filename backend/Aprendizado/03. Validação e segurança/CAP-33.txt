@@ -1,0 +1,3 @@
+Neste capítulo foi apresentado o desafio que deve ser entregue para finalizar esse capítulo (curso de Validação e Segurança)
+
+A resposta (projeto) ficou no repositório: https://github.com/RodrigoFranco91/homework-3-devsuperior

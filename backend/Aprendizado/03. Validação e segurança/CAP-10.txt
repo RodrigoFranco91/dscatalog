@@ -1,0 +1,60 @@
+Neste capítulo começamos a usar o Bean Validation:
+
+
+- No nosso arquivo pom.xml precisamos ter a dependencia:
+
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-validation</artifactId>
+	</dependency>
+
+
+- Vamos usar anotações preferencialmente do pacote:
+
+	javax.validation.constraints.NotEmpty
+
+
+- Na classe UserDTO aplicamos algumas anotações do Bean Validation:
+
+	private Long id;
+	
+	@NotBlank(message = "Campo obrigatório")
+	private String firstName;
+	
+	private String lastName;
+	
+	@Email(message = "Favor entrar com e-mail válido")
+	private String email;
+	
+	private Set<RoleDTO> roles = new HashSet<>();
+
+
+-Na classe ProductDTO aplicamos algumas anotações do Bean Validation:
+
+	private Long id;
+	
+	@Size(min = 5, max = 60, message = "Deve ter entre 5 e 60 caracteres")
+	@NotBlank(message = "Campo Obrigatório")
+	private String name;
+
+	private String description;
+	
+	@Positive(message = "Preço deve ser um valor positivo")
+	private String price;
+
+	private String imgUrl;
+	
+	@PastOrPresent(message = "Data do produto não pode ser futura")
+	private Instant date;
+
+	private List<CategoryDTO> categories = new ArrayList<>();
+
+
+- Agora para ocorrer a validação dessas anotações, devemos ir na classe do tipo Resource/Controller e nos métodos que recebem os objetos DTO's colocar a
+anotação @Valid. Veja um exemplo da classe ProductResource:
+
+	@PostMapping
+	public ResponseEntity<ProductDTO> insert(@RequestBody @Valid ProductDTO dto){}
+
+
+- Tenha em mente que agora ao fazer uma requisição e a validação falhar, teremos um retorno de Bad Request devo a Exception lançada, no caso MethodArgumentNotValidException. No próximo capitulo vamos tratar esse erro.

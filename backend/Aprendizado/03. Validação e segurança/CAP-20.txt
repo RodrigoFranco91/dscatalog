@@ -1,0 +1,10 @@
+Neste capítulo fizemos um check-list do que teremos que fazer para implementar o Spring Cloud OAuth2:
+
+
+	1) Criar a classe de configuração para Authorization Server (configurando nosso aplicação como Servidor de Autorização). A classe tem que ser filha
+	de AuthorizationServerConfigurerAdapter
+
+	2) Criar a classe de configuração para Resource Server (configurando nosso aplicação como Servidor de Recurso). A classe tem que ser filha
+	de ResourceServerConfigurerAdapter
+
+	3) Criar dois Bean's se quisermos usar o padrão JWT, no caso: JwtAccessTokenConverter e JwtTokenStore

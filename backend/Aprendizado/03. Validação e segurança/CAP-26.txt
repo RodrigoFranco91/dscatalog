@@ -1,0 +1,90 @@
+Neste capítulo implementamos o checklist do OAuth2 - Servidor de Recurso (Resource Server):
+
+
+- Relembrando o checklist:
+
+	- Criar a classe de configuração para Resource Server (configurando nosso aplicação como Servidor de Recurso). A classe tem que ser filha
+	de ResourceServerConfigurerAdapter.
+
+
+- Implementando:
+
+	1) No pacote config criar a classe ResourceServerConfig que deve extender (ser filha) de ResourceServerConfigurerAdapter. A classe ainda deve
+	ser anotada com @Configuration e EnableResourceServer. Veja:
+
+		@Configuration
+		@EnableResourceServer
+		public class ResourceServerConfig extends ResourceServerConfigurerAdapter{}
+
+	2) Devemos sobrescrever os 2 métodos configure() da classe mãe. Veja:
+
+		@Override
+		public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+			super.configure(resources);
+		}
+
+		@Override
+		public void configure(HttpSecurity http) throws Exception {
+			super.configure(http);
+		}
+
+	3) Na classe, vamos criar um atributo do tipo JwtTokenStore anotado com @Autowired:
+
+		@Autowired
+		private JwtTokenStore tokenStore;
+
+	4) O método configure(ResourceServerSecurityConfigurer resources) deve ficar assim:
+
+		@Override
+		public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+			resources.tokenStore(tokenStore);
+		}	
+	
+	Agora nosso resource server já sabe analisar se o token é valido!
+
+	5) É no método configure(HttpSecurity http) que configuramos a autorização, ou seja, quem pode acessar determinado path (recurso).
+	Vamos criar alguns vetores de string para facilitar relacionar o papel do usuário com o path que ele poderá acessar. Veja como ficou
+	toda a classe (foque nos vetores e o método configure):
+
+
+		@Configuration
+		@EnableResourceServer
+		public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
+
+			@Autowired
+			private JwtTokenStore tokenStore;
+	
+			private static final String[] PUBLIC = {"/oauth/token"};
+	
+			private static final String[] OPERATOR_OR_ADMIN = {"/products/**", "/categories/**"};
+	
+			private static final String[] ADMIN = {"/users/**"};
+	
+			@Override
+			public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+				resources.tokenStore(tokenStore);
+			}
+
+			@Override
+			public void configure(HttpSecurity http) throws Exception {
+				http.authorizeRequests()
+				.antMatchers(PUBLIC).permitAll()
+				.antMatchers(HttpMethod.GET, OPERATOR_OR_ADMIN).permitAll()
+				.antMatchers(OPERATOR_OR_ADMIN).hasAnyRole("OPERATOR", "ADMIN")
+				.antMatchers(ADMIN).hasRole("ADMIN")
+				.anyRequest().authenticated();
+			}
+	
+		}
+
+	Vamos entender esse método:
+
+		- Devemos autorizar as requisições com as seguintes regras:
+			- Os path que estão em PUBLIC todos podem acessar sem necessidade de Logar-se;
+			- Os paths que estão em OPERATOR_OR_ADMIN quando forem do verbo GET, todos podem acessar;
+			- Os paths que estão em OPERATOR_OR_ADMIN (tirando o get que foi mapeado anteriormente) exige que usuario seja OPERATOR ou ADMIN;
+			- Os paths que estão em ADMIN exige que o usuário seja um ADMIN;
+			- Qualquer outro path exige-se usuário logado (pode ser qualquer papel/perfil/role).
+
+	6) Faça agora request no Postman testando os cenários. Não se esqueça que em alguns paths teremos que enviar o Token e temos que enviar antes o
+	Barear.

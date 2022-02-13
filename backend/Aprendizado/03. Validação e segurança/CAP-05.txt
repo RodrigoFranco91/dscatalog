@@ -1,0 +1,70 @@
+Neste capitulo terminamos de implementar as entidades User e Role, no caso fizemos o relacionamento e utilizamos as anotações necessárias. Alem disso 
+adicionamos no arquivo data.sql (Seed do banco) registros de User e Role:
+
+
+- Finalizando a entidade role:
+
+	1) No pacote entities criar a classe Role:
+
+		@Entity
+		@Table(name = "tb_role")
+		public class Role implements Serializable{
+
+			private static final long serialVersionUID = 1L;
+
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)	
+			private Long id;
+			private String authority;
+		
+			//Construtor com argumentos,
+			//Construtor sem argumentos,
+			//Getters e Setters,
+			//Equal e Hashcode.			
+
+		}
+
+
+- Finalizando a entidade User:
+
+	1) No pacote entities criar a classe User:
+
+		@Entity
+		@Table(name = "tb_user")
+		public class User implements Serializable{
+
+			private static final long serialVersionUID = 1L;
+
+			@Id
+			@GeneratedValue(strategy = GenerationType.IDENTITY)
+			private Long id;
+			private String firstName;
+			private String lastName;
+			private String email;
+			private String password;
+	
+			@ManyToMany(fetch = FetchType.EAGER)
+			@JoinTable(name="tb_user_role",
+				joinColumns = @JoinColumn(name = "user_id"),
+				inverseJoinColumns = @JoinColumn(name="role_id"))
+			private Set<Role> roles = new HashSet<>();
+
+			//Construtor com argumentos,
+			//Construtor sem argumentos,
+			//Getters e Setters,
+			//Equal e Hashcode.			
+
+		}
+
+
+- No arquivo data.sql, adicionamos o trecho:
+
+INSERT INTO tb_user (first_name, last_name, email, password) VALUES ('Alex', 'Brown', 'alex@gmail.com', '$2a$10$eACCYoNOHEqXve8aIWT8Nu3PkMXWBaOxJ9aORUYzfMQCbVBIhZ8tG');
+INSERT INTO tb_user (first_name, last_name, email, password) VALUES ('Maria', 'Green', 'maria@gmail.com', '$2a$10$eACCYoNOHEqXve8aIWT8Nu3PkMXWBaOxJ9aORUYzfMQCbVBIhZ8tG');
+
+INSERT INTO tb_role (authority) VALUES ('ROLE_OPERATOR');
+INSERT INTO tb_role (authority) VALUES ('ROLE_ADMIN');
+
+INSERT INTO tb_user_role (user_id, role_id) VALUES (1, 1);
+INSERT INTO tb_user_role (user_id, role_id) VALUES (2, 1);
+INSERT INTO tb_user_role (user_id, role_id) VALUES (2, 2);

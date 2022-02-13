@@ -1,0 +1,125 @@
+Neste capítulo implementamos o checklist do OAuth2 - Servidor de Autorização (Authorization Server):
+
+
+- Relembrando o checklist:
+
+	1) Criar a classe de configuração para Authorization Server (configurando nosso aplicação como Servidor de Autorização). A classe tem que ser filha
+	de AuthorizationServerConfigurerAdapter
+
+	2) Criar a classe de configuração para Resource Server (configurando nosso aplicação como Servidor de Recurso). A classe tem que ser filha
+	de ResourceServerConfigurerAdapter -> Este item será feito no capitulo 26.
+
+	3) Criar dois Bean's se quisermos usar o padrão JWT, no caso: JwtAccessTokenConverter e JwtTokenStore
+
+
+- Implementando o item 3 (Beans do JwtAccessTokenConverter e JwtTokenStore):
+
+	1) A criação de Bean é feito com anotação @Bean em cima de um método, logo teremos que criar 2 métodos. Esses métodos devem estar em uma classe
+	anotada com @Configuration. Poderiamos criar uma classe, mas vamos aproveitar a classe AppConfig que criamos para criar o Bean do BCrypt.
+	Então na classe AppConfig adicioanr os dois métodos:
+
+		@Bean
+		public JwtAccessTokenConverter accessTokenConverter() {
+			JwtAccessTokenConverter tokenConverter = new JwtAccessTokenConverter();
+			tokenConverter.setSigningKey("MY-JWT-SECRET");
+			return tokenConverter;
+		}
+
+		@Bean
+		public JwtTokenStore tokenStore() {
+			return new JwtTokenStore(accessTokenConverter());
+		}
+
+	Esses Beans são objetos que vão saber ler e criar um Token.
+	A nossa assinatura dpo token (segredo) está direto no código, no caso "MY-JWT-SECRET". Posteriormente vamos colocar externamente via variável de 	ambiente.
+
+	
+- Implementando a classe filha de AuthorizationServerConfigurerAdapter (item 1 do checklist), a classe se chamará AuthorizationServerConfig:
+
+	1) No pacote config criar a classe AuthorizationServerConfig que extenderá (será filha de) AuthorizationServerConfigurerAdapter;
+
+	2) A classe deve ser anotada com @Configuration e @EnableAuthorizationServer
+
+	3) A classe mãe nos dá 3 métodos chamados de configure(), cada um com um argumento diferente. Vamos implementar os 3. Veja como está nosso classe
+	até aqui:
+
+		@Configuration
+		@EnableAuthorizationServer
+		public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+			@Override
+			public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+				// TODO Auto-generated method stub
+				super.configure(security);
+			}
+
+			@Override
+			public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+				// TODO Auto-generated method stub
+				super.configure(clients);
+			}
+
+			@Override
+			public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+				// TODO Auto-generated method stub
+				super.configure(endpoints);
+			}
+	
+
+		}
+	
+	4) Vamos criar agora os objetos que precisamos, então na classe AuthorizationServerConfig  vamos criar os atributos:
+
+		@Autowired
+		private BCryptPasswordEncoder passwordEncoder;
+	
+		@Autowired
+		private JwtAccessTokenConverter accessTokenConverter;
+	
+		@Autowired
+		private JwtTokenStore tokenStore;
+	
+		@Autowired
+		private AuthenticationManager authenticationManager;
+
+	5) Agora vamos implementar de fato os 3 métodos configure(). Veja como devem ficar:
+
+		@Override
+		public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+			security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+		}
+
+		//Credenciais do APP. O frontend vai precisar desses dados
+		@Override
+		public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+			clients.inMemory()
+			.withClient("dscatalog")
+			.secret(passwordEncoder.encode("dscatalog123"))
+			.scopes("read", "write")
+			.authorizedGrantTypes("password")
+			.accessTokenValiditySeconds(86400);
+		}
+
+		@Override
+		public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+			endpoints.authenticationManager(authenticationManager)
+			.tokenStore(tokenStore)
+			.accessTokenConverter(accessTokenConverter);
+		}
+
+
+- Nesse ponto já podemos testar se ao fazer Login a API retorna o Token. Para isso siga os passos:
+
+	1) Vá ao Postman e por organização crie um pasta chamada auth;
+
+	2) Vamos fazer uma request do tipo Post para localhost:8080/oauth/token em Authorization devemos escolher o tipo Basic Auth colocando em Username
+	dscatalog e em Password dscatalog123 (pois configuramos esse valores em withClient e secret no metodo configure(ClientDetailsServiceConfigurer 			clients). Ao preencher o Authorization a nossa request já ganhou o Header Authorization com seu valor.
+
+	Ainda na configuração da request, devemos ir em Body -> Selecionar o x-www-form-urlencoded -> e adicionar (KEY/Value):
+	username / alex@gmail.com
+	password / 123456
+	grant_type / password
+
+	3) Enviar a request preparada e devemos já receber o token
+	
+	

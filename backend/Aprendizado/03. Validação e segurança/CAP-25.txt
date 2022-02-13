@@ -1,0 +1,51 @@
+Neste capítulo adicionamos informações ao Token:
+
+
+- É comum o token ter informações, por exemplo ID do usuário, ou o primeiro nome, etc. Vamos adicionar esses dados no token:
+
+	1) Vamos criar um pacote chamado components e neste criar a classe JwtTokenEnhancer. A classe deve ser anotada @Component e implementar a interface
+	TokenEnhancer.
+
+	2) Devemos implementar o método enhance() que veio da interface TokenEnhancer. Veja como ficou a classe e o método:
+
+		@Component
+		public class JwtTokenEnhancer implements TokenEnhancer {
+	
+			@Autowired
+			UserRepository userRepository;
+
+			@Override
+			public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
+		
+				User user = userRepository.findByEmail(authentication.getName());
+		
+				//No token a informação extra vai via Map, com nome do campo e valor
+				Map<String, Object> map = new HashMap<>();
+				map.put("userFirstName", user.getFirstName());
+				map.put("userId", user.getId());
+		
+				//Precisamos de uma instancia especifica para poder adicionar informação no token, no caso do tipo DefaultOAuth2AccessToken
+				DefaultOAuth2AccessToken token = (DefaultOAuth2AccessToken) accessToken;
+				token.setAdditionalInformation(map);
+		
+				return token;
+			}
+
+		}
+
+	3) Precisamos mudar agora a classe AuthorizationServerConfig. Devemos criar um atributo do tipo JwtTokenEnhancer, anotado com @Autowired.
+	O método configure(AuthorizationServerEndpointsConfigurer endpoints) deve ficar assim:
+
+		@Override
+		public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		
+			TokenEnhancerChain chain = new TokenEnhancerChain();
+			chain.setTokenEnhancers(Arrays.asList(accessTokenConverter, tokenEnhancer));
+		
+			endpoints.authenticationManager(authenticationManager)
+			.tokenStore(tokenStore)
+			.accessTokenConverter(accessTokenConverter)
+			.tokenEnhancer(chain);
+		}
+
+	4) Agora podemos testar novamente se o token está sendo enviado com informações extras.
